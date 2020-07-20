@@ -1,24 +1,17 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import ListWorkspace from "./components/ListWorkspace";
+import CreateWorkspace from "./components/CreateWorkspace";
+import axios from "./utils/axios";
 
 function App() {
+  const [workspaces, setWorkspace] = useState([]);
+  useEffect(() => {
+    axios.get("/list").then((res) => setWorkspace(res.data));
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="workspace" style={{ textAlign: "center" }}>
+      <ListWorkspace workspaces={workspaces} />
+      <CreateWorkspace />
     </div>
   );
 }

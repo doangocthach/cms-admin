@@ -1,0 +1,40 @@
+.btn-create-workspace {
+  border-radius: 4px;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid #eee;
+  font-size: 18px;
+  font-weight: 900;
+  height: 44px;
+  min-width: 96px;
+  padding: 0 16px 3px;
+  color: #4a154b;
+  background-color: #fff;
+}
+.workspace-form {
+  display: flex;
+  flex-direction: column;
+  width: 500px;
+  margin: auto;
+  margin-top: 10px;
+
+  input {
+    padding: 10px;
+  }
+  button {
+    margin-top: 10px;
+    border-radius: 4px;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid #eee;
+    font-size: 18px;
+    font-weight: 900;
+    height: 44px;
+    min-width: 96px;
+    padding: 0 16px 3px;
+    color: #4a154b;
+    background-color: #fff;
+  }
+}
