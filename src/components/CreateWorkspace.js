@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import "./CreateWorkspace.scss";
 import axios from "../utils/axios";
+import {
+  FormControl,
+  Input,
+  InputLabel,
+  FormHelperText,
+} from "@material-ui/core";
 
 export default function CreateWorkspace() {
   const [state, setState] = useState({ name: "", email: "" });
@@ -26,6 +32,13 @@ export default function CreateWorkspace() {
         {" "}
         Create a Workspace
       </button>
+      <FormControl>
+        <InputLabel htmlFor="my-input">Email address</InputLabel>
+        <Input id="my-input" aria-describedby="my-helper-text" />
+        <FormHelperText id="my-helper-text">
+          We'll never share your email.
+        </FormHelperText>
+      </FormControl>
       {formStatus && (
         <form
           className="workspace-form"
