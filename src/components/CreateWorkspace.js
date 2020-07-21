@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import axios from "../utils/axios";
+import { useHistory } from "react-router-dom";
 import "./createWorkspace.css";
+
 export default () => {
   const [state, setState] = useState({ name: "", email: "" });
+  let history = useHistory();
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = (e) => {
     e.preventDefault();
-    let a = await axios.post("/create", state);
-    console.log(a);
+    axios.post("/create", state);
+    history.push("/");
   };
   return (
     <React.Fragment>
