@@ -1,16 +1,53 @@
 .list-workspace {
-  border: 1px solid #eeeeee;
+  max-width: 1000px;
+  // border: 1px solid #eeeeee;
   padding: 10px;
-  width: 500px;
   margin: 0 auto;
   margin-bottom: 15px;
 
   & ul {
-      list-style: none;
-
-    & li:not(:last-child) {
-      border-bottom: 1px solid #eeeeee;
-      padding-bottom: 10px;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+    padding: 0;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    // background-color: rgb(116, 180, 180);
+    .card-wrapper {
+      padding: 1rem;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      .card-content-wrapper {
+        p {
+          margin: 0;
+        }
+        text-decoration: none;
+        color: black;
+        // text-align: start;
+      }
+      // a {
+      //   text-align: end;
+      //   padding: 0.5rem;
+      //   border: 1px solid;
+      // }
     }
+    & li {
+      cursor: pointer;
+      min-width: 40%;
+      // border: 1px solid;
+      margin: 1rem;
+      padding: 1rem;
+      transition: transform 0.2s;
+    }
+    & li:hover {
+      transform: scale(1.1);
+    }
+    // & li:not(:last-child) {
+    //   border-bottom: 1px solid #eeeeee;
+    //   padding-bottom: 10px;
+    // }
   }
 }
