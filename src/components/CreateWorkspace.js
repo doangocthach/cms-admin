@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import axios from "../utils/axios";
-import Header from "./Header";
 import "./createWorkspace.css";
 export default () => {
   const [state, setState] = useState({ name: "", email: "" });
