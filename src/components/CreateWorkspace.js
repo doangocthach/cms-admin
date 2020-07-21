@@ -1,14 +1,9 @@
 import React, { useState } from "react";
-import "./CreateWorkspace.scss";
 import axios from "../utils/axios";
-
-export default function CreateWorkspace() {
+import Header from "./Header";
+import "./createWorkspace.css";
+export default () => {
   const [state, setState] = useState({ name: "", email: "" });
-  const [formStatus, setFormStatus] = useState(false);
-
-  const handleOpenForm = () => {
-    setFormStatus(!formStatus);
-  };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -16,41 +11,40 @@ export default function CreateWorkspace() {
     console.log(a);
   };
   return (
-    <>
-      <button
-        className="btn btn-create-workspace"
-        onClick={() => {
-          handleOpenForm();
-        }}
-      >
-        {" "}
-        Create a Workspace
-      </button>
-      {formStatus && (
-        <form
-          className="workspace-form"
-          onSubmit={(e) => {
-            handleFormSubmit(e);
-          }}
-        >
-          <input
-            className="workspace-form__name"
-            placeholder="Enter your name workspace"
-            onChange={(e) => {
-              setState({ ...state, name: e.target.value });
+    <React.Fragment>
+      <div className="create-workspace-wrapper">
+        <div className="main-content-wrapper">
+          <h1>First, enter your email</h1>
+          <p>
+            Just one more email — a quick confirmation — before you say goodbye
+            to overstuffed inboxes for good.
+          </p>
+
+          <form
+            className="workspace-form"
+            onSubmit={(e) => {
+              handleFormSubmit(e);
             }}
-          />
-          <br />
-          <input
-            className="workspace-form__email"
-            placeholder="Enter your email"
-            onChange={(e) => {
-              setState({ ...state, email: e.target.value });
-            }}
-          />
-          <button type="submit">Create</button>
-        </form>
-      )}
-    </>
+          >
+            <input
+              className="workspace-form__name"
+              placeholder="Enter your name workspace"
+              onChange={(e) => {
+                setState({ ...state, name: e.target.value });
+              }}
+            />
+            <br />
+            <input
+              className="workspace-form__email"
+              placeholder="Enter your email"
+              onChange={(e) => {
+                setState({ ...state, email: e.target.value });
+              }}
+            />
+            <button type="submit">Create</button>
+          </form>
+        </div>
+      </div>
+    </React.Fragment>
   );
-}
+};
