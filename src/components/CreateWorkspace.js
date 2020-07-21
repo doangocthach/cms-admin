@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "../utils/axios";
+import { TextField, Button } from "@material-ui/core";
 import "./createWorkspace.css";
 export default () => {
   const [state, setState] = useState({ name: "", email: "" });
@@ -25,22 +26,24 @@ export default () => {
               handleFormSubmit(e);
             }}
           >
-            <input
-              className="workspace-form__name"
+            <TextField
+              className="workspace-form__name workspace-form__input"
               placeholder="Enter your name workspace"
+              label="Workspace Name"
               onChange={(e) => {
                 setState({ ...state, name: e.target.value });
               }}
             />
             <br />
-            <input
-              className="workspace-form__email"
+            <TextField
+              className="workspace-form__email workspace-form__input"
               placeholder="Enter your email"
+              label="Email"
               onChange={(e) => {
                 setState({ ...state, email: e.target.value });
               }}
             />
-            <button type="submit">Create</button>
+            <Button type="submit">Create</Button>
           </form>
         </div>
       </div>

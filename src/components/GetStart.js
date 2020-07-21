@@ -1,5 +1,5 @@
 import React from "react";
-import "./GetStart.scss";
+import "./GetStart.css";
 
 import Box from "@material-ui/core/Box";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";

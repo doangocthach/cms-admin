@@ -1,0 +1,28 @@
+.create-workspace {
+  margin: auto;
+  box-shadow: 6px 28px 60px -1px #888888;
+  transition: transform 0.2s;
+  padding: 2rem;
+  color: white;
+  background-color: #3d7c7c;
+}
+
+.create-workspace button {
+  color: rgb(61, 124, 124);
+}
+
+label {
+  color: #3d7c7c !important;
+}
+
+.btn-create-workspace {
+  border-radius: 4px;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 900;
+  height: 44px;
+  min-width: 96px;
+  background-color: #fff;
+}
