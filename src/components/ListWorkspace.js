@@ -1,90 +1,87 @@
-import React from "react";
+import React, { useState } from "react";
 import "./ListWorkspace.scss";
-import { Card } from "@material-ui/core";
+import {
+  TextField,
+  TableContainer,
+  TableRow,
+  TableHead,
+  TableCell,
+  TableBody,
+  Paper,
+  Table,
+  Button,
+} from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import { Pagination } from "@material-ui/lab";
 import { red, blue } from "@material-ui/core/colors";
+const useStyles = makeStyles((theme) => ({
+  root: {
+    "& > *": {
+      marginTop: theme.spacing(2),
+    },
+  },
+}));
 export default function ListWorkspace({ workspaces }) {
+  const classes = useStyles();
+  const [page, setPage] = useState(1);
+  const [searchValue, setSearchVavlue] = useState("");
   return (
-    <div className="list-workspace">
-      <ul>
-        {/* <li>
-          <Card className="card-wrapper">
-            <a href={"/#"} className="card-content-wrapper">
-              <b>Doan Ngoc Thach</b>
-              <p>thachdn.nde18048@vtc.edu.vn</p>
-            </a>
-          </Card>
-        </li>
-        <li>
-          <Card className="card-wrapper">
-            <a href={"/#"} className="card-content-wrapper">
-              <b>vcl</b>
-              <p>email</p>
-            </a>
-          </Card>
-        </li>
-        <li>
-          <Card className="card-wrapper">
-            <a href={"/#"} className="card-content-wrapper">
-              <b>vcl</b>
-              <p>email</p>
-            </a>
-          </Card>
-        </li>
-        <li>
-          <Card className="card-wrapper">
-            <a href={"/#"} className="card-content-wrapper">
-              <b>vcl</b>
-              <p>email</p>
-            </a>
-          </Card>
-        </li>
-        <li>
-          <Card className="card-wrapper">
-            <a href={"/#"} className="card-content-wrapper">
-              <b>vcl</b>
-              <p>email</p>
-            </a>
-          </Card>
-        </li>
-        <li>
-          <Card className="card-wrapper">
-            <a href={"/#"} className="card-content-wrapper">
-              <b>vcl1</b>
-              <p>email</p>
-            </a>
-          </Card>
-        </li>
-        <li>
-          <Card className="card-wrapper">
-            <a href={"/#"} className="card-content-wrapper">
-              <b>vcl</b>
-              <p>email</p>
-            </a>
-          </Card>
-        </li> */}
+    <React.Fragment>
+      <div className="list-workspace">
+        <div className="search-input">
+          <TextField
+            className="search-input__input"
+            label="Search"
+            onChange={(e) => {
+              setSearchVavlue(e.target.value);
+            }}
+          ></TextField>
+          <Button className="search__button">
+            <i class="fas fa-search "></i>
+          </Button>
+        </div>
 
-        {workspaces.map((workspace) =>
-          workspace.isActive ? (
-            <li key={workspace._id} style={{ backgroundColor: blue }}>
-              <Card className="card-wrapper">
-                <a href={"/#"} className="card-content-wrapper">
-                  <b href="/">{workspace.name}</b>
-                  <p>{workspace.email}</p>
-                </a>
-              </Card>
-            </li>
-          ) : (
-            <li key={workspace._id}>
-              <Card className="card-wrapper" style={{ background: "#ff0000" }}>
-                <a href={"/#"} className="card-content-wrapper">
-                  <b href="/">{workspace.name}</b>
-                  <p>{workspace.email}</p>
-                </a>
-              </Card>
-            </li>
-          )
-        )}
-      </ul>
-    </div>
+        <TableContainer component={Paper}>
+          <Table aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell align="left">Workspace Name</TableCell>
+                <TableCell align="left">Email</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {workspaces.map(
+                (workspace) =>
+                  (workspace.email
+                    .toUpperCase()
+                    .includes(searchValue.toUpperCase()) ||
+                    workspace.name
+                      .toUpperCase()
+                      .includes(searchValue.toUpperCase())) && (
+                    <TableRow key={workspace._id}>
+                      <TableCell align="left">
+                        <a href="/" className="card-content-wrapper">
+                          {workspace.name}
+                        </a>
+                      </TableCell>
+                      <TableCell align="left">{workspace.email}</TableCell>
+                    </TableRow>
+                  )
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
+      <div className={classes.root + " page-wrapper"}>
+        <Pagination
+          count={workspaces.length || 1}
+          shape="rounded"
+          onChange={(e, page) => {
+            setPage(page);
+            console.log(page);
+          }}
+        />
+      </div>
+    </React.Fragment>
   );
 }

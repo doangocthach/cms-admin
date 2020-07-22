@@ -38,7 +38,7 @@
   text-align: center;
 }
 
-.main-content-wrapper button {
+.main-content-wrapper>button {
   background-color: rgb(61, 124, 124);
   color: white;
   margin-top: 10px;
