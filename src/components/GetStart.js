@@ -1,9 +1,9 @@
 import React from "react";
 import "./GetStart.css";
-
 import Box from "@material-ui/core/Box";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import CreateWorkspace from "./CreateWorkspace";
+
 export default function GetStart() {
   return (
     <Box className="create-workspace">

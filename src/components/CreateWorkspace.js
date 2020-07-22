@@ -10,7 +10,7 @@ export default () => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    axios.post("/create", state);
+    axios.post("/api/workspace/create", state);
     history.push("/");
   };
   return (
