@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "../utils/axios";
 import { useHistory } from "react-router-dom";
-import { TextField, Button } from "@material-ui/core";
+import { TextField, Button, Paper } from "@material-ui/core";
 import "./createWorkspace.css";
 
 export default () => {
@@ -14,7 +14,7 @@ export default () => {
     history.push("/");
   };
   return (
-    <React.Fragment>
+    <Paper>
       <div className="create-workspace-wrapper">
         <div className="main-content-wrapper">
           <h1>First, enter your email</h1>
@@ -50,6 +50,6 @@ export default () => {
           </form>
         </div>
       </div>
-    </React.Fragment>
+    </Paper>
   );
 };
