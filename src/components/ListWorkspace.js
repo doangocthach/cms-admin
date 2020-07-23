@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./ListWorkspace.scss";
 import {
   TextField,
@@ -11,9 +11,10 @@ import {
   Table,
   Button,
 } from "@material-ui/core";
+import axios from "../utils/axios";
 import { makeStyles } from "@material-ui/core/styles";
 import { Pagination } from "@material-ui/lab";
-import { red, blue } from "@material-ui/core/colors";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
@@ -21,10 +22,28 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-export default function ListWorkspace({ workspaces }) {
+export default function ListWorkspace() {
   const classes = useStyles();
-  const [page, setPage] = useState(1);
-  const [searchValue, setSearchVavlue] = useState("");
+  const [page] = useState(1);
+  const [workspaces, setWorkspace] = useState([]);
+  const [totalWorkspace, setTotalWorkspace] = useState();
+  const [api, setApi] = useState(`/api/workspace/list/1`);
+
+  let searchRef = useRef();
+  useEffect(() => {
+    axios.get(api).then((res) => {
+      setWorkspace(res.data.listWorkspace);
+      setTotalWorkspace(res.data.totalWorkspace);
+    });
+  }, [api, searchRef]);
+
+  const handleSearch = () => {
+    setApi(`/api/workspace/list/${page}?search=${searchRef.value}`);
+  };
+
+  const handlePage = (page) => {
+    setApi(`/api/workspace/list/${page}?search=${searchRef.value}`);
+  };
   return (
     <React.Fragment>
       <div className="list-workspace">
@@ -32,12 +51,18 @@ export default function ListWorkspace({ workspaces }) {
           <TextField
             className="search-input__input"
             label="Search"
-            onChange={(e) => {
-              setSearchVavlue(e.target.value);
-            }}
+            inputRef={(value) => (searchRef = value)}
+            // onChange={(e) => {
+            //   setSearchVavlue(e.target.value);
+            // }}
           ></TextField>
-          <Button className="search__button">
-            <i class="fas fa-search "></i>
+          <Button
+            className="search__button"
+            onClick={() => {
+              handleSearch();
+            }}
+          >
+            <i className="fas fa-search "></i>
           </Button>
         </div>
 
@@ -50,35 +75,26 @@ export default function ListWorkspace({ workspaces }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {workspaces.map(
-                (workspace) =>
-                  (workspace.email
-                    .toUpperCase()
-                    .includes(searchValue.toUpperCase()) ||
-                    workspace.name
-                      .toUpperCase()
-                      .includes(searchValue.toUpperCase())) && (
-                    <TableRow key={workspace._id}>
-                      <TableCell align="left">
-                        <a href="/" className="card-content-wrapper">
-                          {workspace.name}
-                        </a>
-                      </TableCell>
-                      <TableCell align="left">{workspace.email}</TableCell>
-                    </TableRow>
-                  )
-              )}
+              {workspaces.map((workspace) => (
+                <TableRow key={workspace._id}>
+                  <TableCell align="left">
+                    <a href="/" className="card-content-wrapper">
+                      {workspace.name}
+                    </a>
+                  </TableCell>
+                  <TableCell align="left">{workspace.email}</TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
       </div>
       <div className={classes.root + " page-wrapper"}>
         <Pagination
-          count={workspaces.length || 1}
+          count={Math.ceil(totalWorkspace / 3) || 1}
           shape="rounded"
           onChange={(e, page) => {
-            setPage(page);
-            console.log(page);
+            handlePage(page);
           }}
         />
       </div>

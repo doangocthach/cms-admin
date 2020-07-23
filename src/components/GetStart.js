@@ -1,6 +1,5 @@
 import React from "react";
 import "./GetStart.css";
-
 import Box from "@material-ui/core/Box";
 import { Link } from "react-router-dom";
 export default function GetStart() {
