@@ -28,6 +28,9 @@ import Tooltip from "@material-ui/core/Tooltip";
 import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import AddWorkspaceForm from "./AddWorkspaceForm";
+import gql from "graphql-tag";
+
+import { workspaceClient } from "../utils/graphClients";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -234,7 +237,8 @@ EnhancedTableToolbar.propTypes = {
 export default function ListWorkspace() {
   const classes = useStyles();
   // const [page, setPage] = useState(1);
-  const [page] = useState(1);
+  const [page, setPage] = useState(1);
+  const [searchValue, setSearchValue] = useState("");
   // const [searchValue, setSearchVavlue] = useState("");
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
@@ -246,16 +250,32 @@ export default function ListWorkspace() {
   const [api, setApi] = useState(`/api/workspace/list/1`);
 
   let searchRef = useRef();
+
+  const query = gql`
+    query($page: Int, $query: String) {
+      getListWorkspace(page: $page, query: $query) {
+        listWorkspace {
+          id
+          name
+          email
+          createdAt
+        }
+        totalWorkspace
+      }
+    }
+  `;
   useEffect(() => {
-    axios.get(api).then((res) => {
-      setWorkspace(res.data.listWorkspace);
-      setTotalWorkspace(res.data.totalWorkspace);
-    });
     console.log(workspaces);
-  }, [api, searchRef]);
+    workspaceClient
+      .query({ query, variables: { page: page, query: searchValue } })
+      .then((res) => {
+        setWorkspace(res.data.getListWorkspace.listWorkspace);
+        setTotalWorkspace(res.data.getListWorkspace.totalWorkspace);
+      });
+  }, [page, searchValue]);
 
   const handleSearch = () => {
-    setApi(`/api/workspace/list/${page}?search=${searchRef.value}`);
+    setSearchValue(searchRef.value);
   };
   const [open, setOpen] = React.useState(false);
 
@@ -267,8 +287,8 @@ export default function ListWorkspace() {
     setOpen(false);
   };
 
-  const handlePage = (page) => {
-    setApi(`/api/workspace/list/${page}?search=${searchRef.value}`);
+  const handlePage = (newPage) => {
+    setPage(newPage);
   };
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -314,6 +334,9 @@ export default function ListWorkspace() {
           <TextField
             className="search-input__input"
             label="Search"
+            // onChange={(e) => {
+            //   setSearchValue(e.target.value);
+            // }}
             inputRef={(value) => (searchRef = value)}
           ></TextField>
           <Button
@@ -350,7 +373,7 @@ export default function ListWorkspace() {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.name}
+                      key={row._id}
                       selected={isItemSelected}
                     >
                       <TableCell
@@ -388,8 +411,8 @@ export default function ListWorkspace() {
         <Pagination
           count={Math.ceil(totalWorkspace / 3) || 1}
           shape="rounded"
-          onChange={(e, page) => {
-            handlePage(page);
+          onChange={(e, newPage) => {
+            handlePage(newPage);
           }}
         />
       </div>
