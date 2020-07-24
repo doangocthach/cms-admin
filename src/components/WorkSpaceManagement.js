@@ -16,6 +16,7 @@ import { Pagination } from "@material-ui/lab";
 import AddWorkspaceForm from "./AddWorkspaceForm";
 import gql from "graphql-tag";
 import { workspaceClient } from "../utils/graphClients";
+import { converDateNow } from "../utils/Date";
 import EnhancedTableToolbar, {
   stableSort,
   getComparator,
@@ -63,10 +64,10 @@ const headCells = [
     label: "Owner Email",
   },
   {
-    id: "date",
+    id: "createdAt",
     numeric: false,
     disablePadding: true,
-    label: "Date",
+    label: "Created Date",
   },
 ];
 
@@ -79,6 +80,7 @@ export default function ListWorkspace() {
   const [selected, setSelected] = React.useState([]);
   const [workspaces, setWorkspace] = useState([]);
   const [totalWorkspace, setTotalWorkspace] = useState();
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -104,8 +106,13 @@ export default function ListWorkspace() {
   `;
   useEffect(() => {
     workspaceClient
-      .query({ query, variables: { page: page, query: searchValue } })
+      .query({
+        query,
+        variables: { page: page, query: searchValue },
+        fetchPolicy: "no-cache",
+      })
       .then((res) => {
+        console.log(res.data);
         setWorkspace(res.data.getListWorkspace.listWorkspace);
         setTotalWorkspace(res.data.getListWorkspace.totalWorkspace);
       });
@@ -223,7 +230,7 @@ export default function ListWorkspace() {
                         {row.email}
                       </TableCell>
                       <TableCell align="left" padding="none">
-                        Date
+                        {converDateNow(row.createdAt)}
                       </TableCell>
                     </TableRow>
                   );
@@ -235,14 +242,19 @@ export default function ListWorkspace() {
       </div>
       <div className={classes.root + " page-wrapper"}>
         <Pagination
-          count={Math.ceil(totalWorkspace / 3) || 1}
+          count={Math.ceil(totalWorkspace / 10) || 1}
           shape="rounded"
           onChange={(e, newPage) => {
             handlePage(newPage);
           }}
         />
       </div>
-      <AddWorkspaceForm open={open} handleClose={handleClose} />
+      <AddWorkspaceForm
+        open={open}
+        handleClose={handleClose}
+        workspaces={workspaces}
+        setWorkspace={setWorkspace}
+      />
     </React.Fragment>
   );
 }

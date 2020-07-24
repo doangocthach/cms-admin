@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "../utils/axios";
 import { useHistory } from "react-router-dom";
 import {
   TextField,
@@ -11,14 +10,29 @@ import {
   DialogActions,
 } from "@material-ui/core";
 import "./createWorkspace.css";
-export default ({ open, handleClose }) => {
-  const [state, setState] = useState({ name: "", email: "" });
-  let history = useHistory();
+import { workspaceClient } from "../utils/graphClients";
+import gql from "graphql-tag";
 
-  const handleFormSubmit = (e) => {
+export default ({ open, handleClose, workspaces, setWorkspace }) => {
+  const [state, setState] = useState({ name: "", email: "" });
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    axios.post("/api/workspace/create", state);
-    history.push("/workspaces");
+    const mutation = gql`
+      mutation($name: String, $email: String) {
+        createWorkspace(name: $name, email: $email) {
+          id
+          name
+          email
+          createdAt
+        }
+      }
+    `;
+
+    const res = await workspaceClient.mutate({ mutation, variables: state });
+    const newWorkspace = [...workspaces];
+    newWorkspace.pop();
+    setWorkspace([res.data.createWorkspace, ...newWorkspace]);
   };
 
   return (
