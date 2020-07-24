@@ -17,13 +17,26 @@ import EnhancedTableToolbar, {
   EnhancedTableHead,
 } from "./HeadTable";
 import { TextField, Button } from "@material-ui/core";
-function createData(name, workspace, date) {
-  return { name, workspace, date };
+
+import DetailCampaign from "./DetailCampaign";
+import AddCampaignForm from "./AddCampaignForm";
+function createData(name, workspace, fromDate, toDate) {
+  return { name, workspace, fromDate, toDate };
 }
 
 const rows = [
-  createData("Xuan Mai", "Tekmate", new Date(2020, 7, 23)),
-  createData("Son Tung", "Dong Bat", new Date(2020, 7, 24)),
+  createData(
+    "Xuan Mai",
+    "Tekmate",
+    new Date(2020, 7, 23),
+    new Date(2020, 8, 23)
+  ),
+  createData(
+    "Son Tung",
+    "Dong Bat",
+    new Date(2020, 7, 24),
+    new Date(2020, 9, 23)
+  ),
 ];
 
 const headCells = [
@@ -39,7 +52,8 @@ const headCells = [
     disablePadding: false,
     label: "Workspace",
   },
-  { id: "date", numeric: false, disablePadding: false, label: "Date" },
+  { id: "fromDate", numeric: false, disablePadding: false, label: "From" },
+  { id: "toDate", numeric: false, disablePadding: false, label: "To" },
 ];
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -74,7 +88,15 @@ export default function EnhancedTable() {
   const [selected, setSelected] = React.useState([]);
   const [page] = React.useState(0);
   const [dense] = React.useState(false);
-  const [rowsPerPage] = React.useState(5);
+  const [openDetail, setOpenDetail] = React.useState(false);
+  const [dataSelected, setDataSelected] = React.useState({});
+  const handlerClickOpen = () => {
+    setOpenDetail(true);
+  };
+
+  const handlerClose = () => {
+    setOpenDetail(false);
+  };
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -113,8 +135,6 @@ export default function EnhancedTable() {
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
   const handlePage = (page) => {
     setApi(`/api/workspace/list/${page}?search=${searchRef.value}`);
   };
@@ -126,6 +146,9 @@ export default function EnhancedTable() {
   const handleOpen = () => {
     setOpen(true);
   };
+  const handleClose = () => {
+    setOpen(false);
+  };
   const [api, setApi] = useState(`/api/workspace/list/1`);
   const [campaigns, setCampaigns] = useState([]);
   let searchRef = useRef();
@@ -135,7 +158,7 @@ export default function EnhancedTable() {
       setTotalCampains(res.data.totalWorkspace);
     });
     console.log(campaigns);
-  }, [api, searchRef]);
+  }, [api, searchRef, campaigns]);
 
   return (
     <div className={classes.root}>
@@ -175,9 +198,8 @@ export default function EnhancedTable() {
               headCells={headCells}
             />
             <TableBody>
-              {stableSort(rows, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
+              {stableSort(rows, getComparator(order, orderBy)).map(
+                (row, index) => {
                   const isItemSelected = isSelected(row.name);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -209,24 +231,35 @@ export default function EnhancedTable() {
                       </TableCell>
                       <TableCell align="left">{row.workspace}</TableCell>
                       <TableCell align="left">
-                        {row.date.toString("dd/mm/yyyy")}
+                        {row.fromDate.toString("dd/mm/yyyy")}
+                      </TableCell>
+                      <TableCell align="left">
+                        {row.toDate.toString("dd/mm/yyyy")}
                       </TableCell>
                       <TableCell>
-                        <Button>Detail</Button>
+                        <Button
+                          onClick={() => {
+                            handlerClickOpen();
+                            setDataSelected(row);
+                          }}
+                        >
+                          Detail
+                        </Button>
                       </TableCell>
                     </TableRow>
                   );
-                })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
+                }
               )}
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
-
+      <DetailCampaign
+        campaign={dataSelected}
+        open={openDetail}
+        handleClose={handlerClose}
+      />
+      <AddCampaignForm open={open} handleClose={handleClose} />
       <div className={classes.root + " page-wrapper"}>
         <Pagination
           count={Math.ceil(totalCampains / 3) || 1}

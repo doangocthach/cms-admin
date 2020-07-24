@@ -56,18 +56,20 @@ const headCells = [
     numeric: false,
     disablePadding: true,
     label: "Workspace Name",
+    type: "string",
   },
   {
     id: "email",
     numeric: false,
     disablePadding: true,
     label: "Owner Email",
+    type: "string",
   },
   {
     id: "createdAt",
     numeric: false,
     disablePadding: true,
-    label: "Created Date",
+    label: "Created Date"
   },
 ];
 
