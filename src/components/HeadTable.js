@@ -85,6 +85,7 @@ const useToolbarStyles = makeStyles((theme) => ({
   },
 }));
 export function descendingComparator(a, b, orderBy) {
+  // console.log(b[orderBy]);
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -102,11 +103,15 @@ export function getComparator(order, orderBy) {
 
 export function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
+  // if (el.type === "date") {
+  // }
+
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) return order;
     return a[1] - b[1];
   });
+
   return stabilizedThis.map((el) => el[0]);
 }
 
@@ -135,9 +140,7 @@ export default (props) => {
           variant="h6"
           id="tableTitle"
           component="div"
-        >
-          Campaigns
-        </Typography>
+        ></Typography>
       )}
 
       {numSelected > 0 ? (

@@ -54,18 +54,21 @@ const headCells = [
     numeric: false,
     disablePadding: true,
     label: "Workspace Name",
+    type: "string",
   },
   {
     id: "email",
     numeric: false,
     disablePadding: true,
     label: "Owner Email",
+    type: "string",
   },
   {
     id: "date",
     numeric: false,
     disablePadding: true,
     label: "Date",
+    type: "date",
   },
 ];
 
@@ -92,8 +95,7 @@ export default function ListWorkspace() {
       setWorkspace(res.data.listWorkspace);
       setTotalWorkspace(res.data.totalWorkspace);
     });
-    console.log(workspaces);
-  }, [api, searchRef]);
+  }, [api, searchRef, workspaces]);
 
   const handleSearch = () => {
     setApi(`/api/workspace/list/${page}?search=${searchRef.value}`);
