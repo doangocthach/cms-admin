@@ -1,4 +1,4 @@
-export const converDateNow = (now) => {
+export const convertDateNow = (now) => {
   let today = new Date(parseInt(now));
   let day = today.getDate() + "";
   let month = today.getMonth() + 1 + "";

@@ -20,25 +20,13 @@ import { TextField, Button } from "@material-ui/core";
 
 import DetailCampaign from "./DetailCampaign";
 import AddCampaignForm from "./AddCampaignForm";
+import gql from "graphql-tag";
+import { campaignClient } from "../utils/graphClients";
+import { convertDateNow } from "../utils/Date";
+
 function createData(name, workspace, fromDate, toDate) {
   return { name, workspace, fromDate, toDate };
 }
-
-const rows = [
-  createData(
-    "Xuan Mai",
-    "Tekmate",
-    new Date(2020, 7, 23),
-    new Date(2020, 8, 23)
-  ),
-  createData(
-    "Son Tung",
-    "Dong Bat",
-    new Date(2020, 7, 24),
-    new Date(2020, 9, 23)
-  ),
-];
-
 const headCells = [
   {
     id: "name",
@@ -81,15 +69,47 @@ const useStyles = makeStyles((theme) => ({
 
 export default function EnhancedTable() {
   const classes = useStyles();
+  const [campaigns, setCampaigns] = useState([]);
   const [totalCampains, setTotalCampains] = useState();
 
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
-  const [page] = React.useState(0);
+  const [page, setPage] = useState(1);
+  const [searchValue, setSearchValue] = useState("");
   const [dense] = React.useState(false);
   const [openDetail, setOpenDetail] = React.useState(false);
   const [dataSelected, setDataSelected] = React.useState({});
+
+  let searchRef = useRef();
+
+  const query = gql`
+    query($page: Int, $query: String) {
+      getListCampaign(page: $page, query: $query) {
+        listCampaign {
+          name
+          email
+          createdAt
+          expiredAt
+          workspaceName
+        }
+        totalCampaign
+      }
+    }
+  `;
+  useEffect(() => {
+    campaignClient
+      .query({
+        query,
+        variables: { page: page, query: searchValue },
+        fetchPolicy: "no-cache",
+      })
+      .then((res) => {
+        setCampaigns(res.data.getListCampaign.listCampaign);
+        setTotalCampains(res.data.getListCampaign.totalCampaign);
+      });
+  }, [query, page, searchValue]);
+
   const handlerClickOpen = () => {
     setOpenDetail(true);
   };
@@ -106,7 +126,7 @@ export default function EnhancedTable() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = rows.map((n) => n.name);
+      const newSelecteds = campaigns.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -135,11 +155,11 @@ export default function EnhancedTable() {
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
-  const handlePage = (page) => {
-    setApi(`/api/workspace/list/${page}?search=${searchRef.value}`);
+  const handlePage = (newPage) => {
+    setPage(newPage);
   };
   const handleSearch = () => {
-    setApi(`/api/workspace/list/${page}?search=${searchRef.value}`);
+    setSearchValue(searchRef.value);
   };
 
   const [open, setOpen] = React.useState(false);
@@ -149,16 +169,6 @@ export default function EnhancedTable() {
   const handleClose = () => {
     setOpen(false);
   };
-  const [api, setApi] = useState(`/api/workspace/list/1`);
-  const [campaigns, setCampaigns] = useState([]);
-  let searchRef = useRef();
-  useEffect(() => {
-    axios.get(api).then((res) => {
-      setCampaigns(res.data.listWorkspace);
-      setTotalCampains(res.data.totalWorkspace);
-    });
-    console.log(campaigns);
-  }, [api, searchRef, campaigns]);
 
   return (
     <div className={classes.root}>
@@ -194,11 +204,11 @@ export default function EnhancedTable() {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={campaigns.length}
               headCells={headCells}
             />
             <TableBody>
-              {stableSort(rows, getComparator(order, orderBy)).map(
+              {stableSort(campaigns, getComparator(order, orderBy)).map(
                 (row, index) => {
                   const isItemSelected = isSelected(row.name);
                   const labelId = `enhanced-table-checkbox-${index}`;
@@ -229,12 +239,12 @@ export default function EnhancedTable() {
                       >
                         {row.name}
                       </TableCell>
-                      <TableCell align="left">{row.workspace}</TableCell>
+                      <TableCell align="left">{row.workspaceName}</TableCell>
                       <TableCell align="left">
-                        {row.fromDate.toString("dd/mm/yyyy")}
+                        {convertDateNow(row.createdAt)}
                       </TableCell>
                       <TableCell align="left">
-                        {row.toDate.toString("dd/mm/yyyy")}
+                        {convertDateNow(row.expiredAt)}
                       </TableCell>
                       <TableCell>
                         <Button
@@ -259,13 +269,18 @@ export default function EnhancedTable() {
         open={openDetail}
         handleClose={handlerClose}
       />
-      <AddCampaignForm open={open} handleClose={handleClose} />
+      <AddCampaignForm
+        open={open}
+        handleClose={handleClose}
+        campaigns={campaigns}
+        setCampaigns={setCampaigns}
+      />
       <div className={classes.root + " page-wrapper"}>
         <Pagination
-          count={Math.ceil(totalCampains / 3) || 1}
+          count={Math.ceil(totalCampains / 10) || 1}
           shape="rounded"
-          onChange={(e, page) => {
-            handlePage(page);
+          onChange={(e, newPage) => {
+            handlePage(newPage);
           }}
         />
       </div>

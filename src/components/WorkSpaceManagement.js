@@ -16,7 +16,7 @@ import { Pagination } from "@material-ui/lab";
 import AddWorkspaceForm from "./AddWorkspaceForm";
 import gql from "graphql-tag";
 import { workspaceClient } from "../utils/graphClients";
-import { converDateNow } from "../utils/Date";
+import { convertDateNow } from "../utils/Date";
 import EnhancedTableToolbar, {
   stableSort,
   getComparator,
@@ -114,7 +114,6 @@ export default function ListWorkspace() {
         fetchPolicy: "no-cache",
       })
       .then((res) => {
-        console.log(res.data);
         setWorkspace(res.data.getListWorkspace.listWorkspace);
         setTotalWorkspace(res.data.getListWorkspace.totalWorkspace);
       });
@@ -232,7 +231,7 @@ export default function ListWorkspace() {
                         {row.email}
                       </TableCell>
                       <TableCell align="left" padding="none">
-                        {converDateNow(row.createdAt)}
+                        {convertDateNow(row.createdAt)}
                       </TableCell>
                     </TableRow>
                   );
