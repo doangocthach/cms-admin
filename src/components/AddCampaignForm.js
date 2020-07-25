@@ -81,8 +81,8 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
           {/* <FormControl> */}
           <TextField
             className="workspace-form__name workspace-form__input"
-            placeholder="Enter your name workspace"
-            label="Workspace Name"
+            placeholder="Enter your campaign name"
+            label="Campaign Name"
             onChange={(e) => {
               setState({ ...state, name: e.target.value });
             }}
@@ -90,8 +90,8 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
           <br />
           <TextField
             className="workspace-form__email workspace-form__input"
-            placeholder="Enter  email"
-            label="Email"
+            placeholder="Enter Workspace Email"
+            label="Workspace Email"
             onChange={(e) => {
               setState({ ...state, workspace: e.target.value });
             }}
@@ -126,23 +126,6 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
               }}
             />
           </MuiPickersUtilsProvider>
-          {/* <TextField
-          className="workspace-form__email workspace-form__input"
-          placeholder="Enter start of campaign"
-          label="Email"
-          onChange={(e) => {
-            setState({ ...state, createdAt: e.target.value });
-          }}
-        />
-        <TextField
-          className="workspace-form__email workspace-form__input"
-          placeholder="Enter end of campaign"
-          label="Email"
-          onChange={(e) => {
-            setState({ ...state, expiredAt: e.target.value });
-          }}
-        /> */}
-          {/* </FormControl> */}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">

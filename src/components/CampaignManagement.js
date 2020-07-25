@@ -9,6 +9,8 @@ import {
   makeStyles,
   Table,
   Paper,
+  Popover,
+  Typography,
 } from "@material-ui/core";
 import axios from "../utils/axios";
 import EnhancedTableToolbar, {
@@ -17,7 +19,7 @@ import EnhancedTableToolbar, {
   EnhancedTableHead,
 } from "./HeadTable";
 import { TextField, Button } from "@material-ui/core";
-
+import EditCampaignForm from "./EditCampaignForm";
 import DetailCampaign from "./DetailCampaign";
 import AddCampaignForm from "./AddCampaignForm";
 import gql from "graphql-tag";
@@ -65,6 +67,9 @@ const useStyles = makeStyles((theme) => ({
     top: 20,
     width: 1,
   },
+  typography: {
+    padding: theme.spacing(2),
+  },
 }));
 
 export default function EnhancedTable() {
@@ -110,6 +115,7 @@ export default function EnhancedTable() {
       });
   }, [query, page, searchValue]);
 
+  const [openEditForm, setOpenEditForm] = React.useState(false);
   const handlerClickOpen = () => {
     setOpenDetail(true);
   };
@@ -170,6 +176,10 @@ export default function EnhancedTable() {
     setOpen(false);
   };
 
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const openPop = Boolean(anchorEl);
+  const id = openPop ? "simple-popover" : undefined;
   return (
     <div className={classes.root}>
       <div className="search-input">
@@ -247,13 +257,46 @@ export default function EnhancedTable() {
                         {convertDateNow(row.expiredAt)}
                       </TableCell>
                       <TableCell>
+                        <Popover
+                          id={id}
+                          open={openPop}
+                          anchorEl={anchorEl}
+                          onClose={() => {
+                            setAnchorEl(null);
+                          }}
+                          anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "center",
+                          }}
+                          transformOrigin={{
+                            vertical: "top",
+                            horizontal: "center",
+                          }}
+                        >
+                          <Typography className={classes.typography}>
+                            <Button
+                              onClick={() => {
+                                handlerClickOpen();
+                              }}
+                            >
+                              Detail
+                            </Button>
+                            <Button
+                              onClick={() => {
+                                setOpenEditForm(true);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                          </Typography>
+                        </Popover>
                         <Button
-                          onClick={() => {
-                            handlerClickOpen();
+                          onClick={(e) => {
+                            setAnchorEl(e.currentTarget);
                             setDataSelected(row);
                           }}
                         >
-                          Detail
+                          Action
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -268,6 +311,11 @@ export default function EnhancedTable() {
         campaign={dataSelected}
         open={openDetail}
         handleClose={handlerClose}
+      />
+      <EditCampaignForm
+        campaign={dataSelected}
+        open={openEditForm}
+        handleClose={setOpenEditForm}
       />
       <AddCampaignForm
         open={open}
