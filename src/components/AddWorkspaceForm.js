@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  makeStyles,
 } from "@material-ui/core";
 import "./createWorkspace.css";
 import { workspaceClient } from "../utils/graphClients";
@@ -28,12 +29,18 @@ export default ({ open, handleClose, workspaces, setWorkspace }) => {
         }
       }
     `;
-
     const res = await workspaceClient.mutate({ mutation, variables: state });
     const newWorkspace = [...workspaces];
     newWorkspace.pop();
     setWorkspace([res.data.createWorkspace, ...newWorkspace]);
   };
+  const useStyles = makeStyles((theme) => ({
+    dialog: {
+      display: "flex",
+      flexFlow: "column",
+    },
+  }));
+  const classes = useStyles();
 
   return (
     <Dialog
@@ -42,7 +49,7 @@ export default ({ open, handleClose, workspaces, setWorkspace }) => {
       aria-labelledby="form-dialog-title"
     >
       <DialogTitle id="form-dialog-title">Add Workspace</DialogTitle>
-      <DialogContent>
+      <DialogContent className={classes.dialog}>
         <DialogContentText>
           Enter workspace name and owner email to create new workspace!
         </DialogContentText>
