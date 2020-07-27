@@ -31,8 +31,8 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
   const [state, setState] = useState({
     name: "",
     email: "",
-    createdAt: null,
-    expiredAt: null,
+    createdAt: "",
+    expiredAt: "",
   });
 
   const handleFormSubmit = async (e) => {
@@ -41,8 +41,8 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
       mutation(
         $name: String
         $email: String
-        $createdAt: Int
-        $expiredAt: Int
+        $createdAt: String
+        $expiredAt: String
       ) {
         createCampaign(
           name: $name
@@ -50,16 +50,28 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
           createdAt: $createdAt
           expiredAt: $expiredAt
         ) {
+          _id
           name
           email
+          googleAnalytics {
+            trackingId
+            isActive
+          }
           createdAt
           expiredAt
+          workspaceName
         }
       }
     `;
-    console.log(state);
-    const res = await campaignClient.mutate({ mutation, variables: state });
-    console.log(res);
+    const res = await campaignClient.mutate({
+      mutation,
+      variables: {
+        name: state.name,
+        email: state.email,
+        createdAt: state.createdAt.toString(),
+        expiredAt: state.expiredAt.toString(),
+      },
+    });
     const newCampaign = [...campaigns];
     newCampaign.pop();
     setCampaigns([res.data.createCampaign, ...newCampaign]);
@@ -93,7 +105,7 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
             placeholder="Enter Workspace Email"
             label="Workspace Email"
             onChange={(e) => {
-              setState({ ...state, workspace: e.target.value });
+              setState({ ...state, email: e.target.value });
             }}
           />
           <MuiPickersUtilsProvider utils={DateFnsUtils}>

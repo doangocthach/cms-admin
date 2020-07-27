@@ -92,8 +92,13 @@ export default function EnhancedTable() {
     query($page: Int, $query: String) {
       getListCampaign(page: $page, query: $query) {
         listCampaign {
+          _id
           name
           email
+          googleAnalytics {
+            trackingId
+            isActive
+          }
           createdAt
           expiredAt
           workspaceName
@@ -110,6 +115,7 @@ export default function EnhancedTable() {
         fetchPolicy: "no-cache",
       })
       .then((res) => {
+        console.log(res);
         setCampaigns(res.data.getListCampaign.listCampaign);
         setTotalCampains(res.data.getListCampaign.totalCampaign);
       });

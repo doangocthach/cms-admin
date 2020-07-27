@@ -3,14 +3,10 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
-  TextField,
   DialogActions,
   Button,
   Divider,
   makeStyles,
-  Card,
-  Typography,
 } from "@material-ui/core";
 import "./highlight.css";
 import Highlight from "react-highlight.js";
@@ -21,7 +17,10 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
-import json2csv, { Parser } from "json2csv";
+import { Parser } from "json2csv";
+import { campaignClient } from "../utils/graphClients";
+import gql from "graphql-tag";
+
 const useStyles = makeStyles((theme) => ({
   btn: {
     width: "100%",
@@ -92,7 +91,6 @@ const Leaderboard = ({ open, handleClose, data }) => {
       </DialogContent>
       <Button
         onClick={() => {
-          const keyNames = Object.keys(data[0]);
           const filename = "leaderboard.csv";
           const parser = new Parser();
           const csv = parser.parse(data);
@@ -131,7 +129,7 @@ const Leaderboard = ({ open, handleClose, data }) => {
   );
 };
 
-const EnableTrading = ({ open, handleClose, setEnableTrading }) => {
+const EnableTrading = ({ open, handleClose, setEnableTrading, trackingId }) => {
   const classes = useStyles();
   return (
     <Dialog
@@ -147,7 +145,7 @@ const EnableTrading = ({ open, handleClose, setEnableTrading }) => {
           (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
           m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
           })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-          ga('create', 'UA-00000000-1', 'auto');
+          ga('create', '${trackingId}', 'auto');
           ga('send', 'pageview');
         </script>
         `}</Highlight>
@@ -173,11 +171,33 @@ const EnableTrading = ({ open, handleClose, setEnableTrading }) => {
 export default ({ campaign, open, handleClose }) => {
   const classes = useStyles();
   const [enableTrading, setEnableTrading] = React.useState(false);
+  const [openTradingDialog, setOpenTradingDialog] = React.useState(false);
+  const [openLeaderboard, setOpenLeaderboard] = React.useState(false);
+  const [trackingId, setTrackingId] = React.useState("");
+
+  const mutation = gql`
+    mutation($campaignId: String, $campaignName: String) {
+      enableTracking(campaignId: $campaignId, campaignName: $campaignName)
+    }
+  `;
+
   const handleCloseTrading = () => {
     setEnableTrading(false);
   };
-  const [openTradingDialog, setOpenTradingDialog] = React.useState(false);
-  const [openLeaderboard, setOpenLeaderboard] = React.useState(false);
+
+  const handleOpenTrading = async () => {
+    console.log(campaign);
+    const res = await campaignClient
+      .mutate({
+        mutation,
+        variables: { campaignId: campaign._id, campaignName: campaign.name },
+      })
+      .then((res) => {
+        setTrackingId(res.data.enableTracking);
+      });
+    console.log(res);
+  };
+
   return (
     <React.Fragment>
       <Dialog
@@ -191,7 +211,7 @@ export default ({ campaign, open, handleClose }) => {
           <p>{campaign.name}</p>
           <Divider />
           <h3>Workspace</h3>
-          <p>{campaign.workspace}</p>
+          <p>{campaign.workspaceName}</p>
           <Divider />
           <br />
           {enableTrading ? (
@@ -207,6 +227,7 @@ export default ({ campaign, open, handleClose }) => {
             <Button
               className={classes.btn + " " + classes.trading}
               onClick={() => {
+                handleOpenTrading();
                 setEnableTrading(true);
                 setOpenTradingDialog(true);
               }}
@@ -237,11 +258,13 @@ export default ({ campaign, open, handleClose }) => {
         open={openLeaderboard}
         handleClose={setOpenLeaderboard}
         data={leaders}
+        trackingId={trackingId}
       />
       <EnableTrading
         open={openTradingDialog}
         handleClose={setOpenTradingDialog}
         setEnableTrading={setEnableTrading}
+        trackingId={trackingId}
       />
     </React.Fragment>
   );
