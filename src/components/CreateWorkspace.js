@@ -42,6 +42,7 @@ export default () => {
               className="workspace-form__email workspace-form__input"
               placeholder="Enter your email"
               label="Email"
+              type="email"
               onChange={(e) => {
                 setState({ ...state, email: e.target.value });
               }}

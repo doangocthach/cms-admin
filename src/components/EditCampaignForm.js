@@ -66,6 +66,7 @@ export default ({ campaign, open, handleClose }) => {
           <Divider />
           <h3>Workspace Email </h3>
           <TextField
+            type="email"
             className={classes.input}
             defaultValue={campaign.workspace}
           ></TextField>

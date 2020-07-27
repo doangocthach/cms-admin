@@ -11,6 +11,7 @@ import {
   makeStyles,
   Card,
   Typography,
+  colors,
 } from "@material-ui/core";
 import "./highlight.css";
 import Highlight from "react-highlight.js";
@@ -49,6 +50,11 @@ const useStyles = makeStyles((theme) => ({
   },
   table: {
     width: "100%",
+  },
+  exportFile: {
+    margin: "1rem",
+    backgroundColor: "blue",
+    color: "white",
   },
 }));
 
@@ -91,6 +97,7 @@ const Leaderboard = ({ open, handleClose, data }) => {
         </TableContainer>
       </DialogContent>
       <Button
+        className={classes.exportFile}
         onClick={() => {
           const keyNames = Object.keys(data[0]);
           const filename = "leaderboard.csv";
@@ -115,7 +122,7 @@ const Leaderboard = ({ open, handleClose, data }) => {
           }
         }}
       >
-        Export Excel File
+        Export all users to excel file
       </Button>
       <DialogActions>
         <Button
