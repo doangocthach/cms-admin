@@ -16,6 +16,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import CampaignManagement from "./CampaignManagement";
+import CampaignInfomation from "./CampaignInfomation";
 
 const drawerWidth = 240;
 
@@ -141,6 +142,10 @@ export default (props) => {
           <Switch>
             <Route path={"/workspaces"} children={<WorkSpaceManagement />} />
             <Route path={"/campaigns"} children={<CampaignManagement />} />
+            <Route
+              path={"/campaign-infomation"}
+              children={<CampaignInfomation />}
+            />
           </Switch>
         </main>
       </div>

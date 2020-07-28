@@ -49,6 +49,11 @@ const useStyles = makeStyles((theme) => ({
   table: {
     width: "100%",
   },
+  exportFile: {
+    margin: "1rem",
+    backgroundColor: "blue",
+    color: "white",
+  },
 }));
 
 const leaders = require("./a.json");
@@ -90,6 +95,7 @@ const Leaderboard = ({ open, handleClose, data }) => {
         </TableContainer>
       </DialogContent>
       <Button
+        className={classes.exportFile}
         onClick={() => {
           const filename = "leaderboard.csv";
           const parser = new Parser();
@@ -113,7 +119,7 @@ const Leaderboard = ({ open, handleClose, data }) => {
           }
         }}
       >
-        Export Excel File
+        Export all users to excel file
       </Button>
       <DialogActions>
         <Button

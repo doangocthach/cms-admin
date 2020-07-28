@@ -67,6 +67,7 @@ export default ({ open, handleClose, workspaces, setWorkspace }) => {
           className="workspace-form__email workspace-form__input"
           placeholder="Enter owner email"
           label="Email"
+          type="email"
           onChange={(e) => {
             setState({ ...state, email: e.target.value });
           }}
