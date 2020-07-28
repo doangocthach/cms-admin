@@ -18,25 +18,63 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
+import { campaignClient } from "../utils/graphClients";
+import gql from "graphql-tag";
+
 const useStyles = makeStyles((theme) => ({
   dialog: {
     display: "flex",
     flexFlow: "column",
   },
 }));
-export default ({ open, handleClose }) => {
+export default ({ open, handleClose, campaigns, setCampaigns }) => {
   const [state, setState] = useState({
     name: "",
-    workspace: "",
-    fromDate: new Date("2014-08-18T21:11:54"),
-    toDate: new Date("2014-08-18T21:11:54"),
+    email: "",
+    createdAt: "",
+    expiredAt: "",
   });
-  let history = useHistory();
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    // axios.post("/api/workspace/create", state);
-    history.push("/campaigns");
+    const mutation = gql`
+      mutation(
+        $name: String
+        $email: String
+        $createdAt: String
+        $expiredAt: String
+      ) {
+        createCampaign(
+          name: $name
+          email: $email
+          createdAt: $createdAt
+          expiredAt: $expiredAt
+        ) {
+          _id
+          name
+          email
+          googleAnalytics {
+            trackingId
+            isActive
+          }
+          createdAt
+          expiredAt
+          workspaceName
+        }
+      }
+    `;
+    const res = await campaignClient.mutate({
+      mutation,
+      variables: {
+        name: state.name,
+        email: state.email,
+        createdAt: state.createdAt.toString(),
+        expiredAt: state.expiredAt.toString(),
+      },
+    });
+    const newCampaign = [...campaigns];
+    newCampaign.pop();
+    setCampaigns([res.data.createCampaign, ...newCampaign]);
   };
   const classes = useStyles();
   return (
@@ -67,7 +105,7 @@ export default ({ open, handleClose }) => {
             placeholder="Enter Workspace Email"
             label="Workspace Email"
             onChange={(e) => {
-              setState({ ...state, workspace: e.target.value });
+              setState({ ...state, email: e.target.value });
             }}
           />
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -77,9 +115,9 @@ export default ({ open, handleClose }) => {
               margin="normal"
               id="date-picker-inline"
               label="From"
-              value={state.fromDate}
+              value={state.createdAt}
               onChange={(date) => {
-                setState({ ...state, fromDate: date });
+                setState({ ...state, createdAt: Date.parse(date) });
               }}
               KeyboardButtonProps={{
                 "aria-label": "change date",
@@ -91,9 +129,9 @@ export default ({ open, handleClose }) => {
               margin="normal"
               id="date-picker-inline"
               label="To"
-              value={state.toDate}
+              value={state.expiredAt}
               onChange={(date) => {
-                setState({ ...state, toDate: date });
+                setState({ ...state, expiredAt: Date.parse(date) });
               }}
               KeyboardButtonProps={{
                 "aria-label": "change date",

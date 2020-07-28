@@ -11,27 +11,16 @@ import {
   Paper,
   Popover,
   Typography,
+  Button,
 } from "@material-ui/core";
-import axios from "../utils/axios";
 import EnhancedTableToolbar, {
   stableSort,
   getComparator,
   EnhancedTableHead,
 } from "./HeadTable";
-import { TextField, Button } from "@material-ui/core";
-import EditCampaignForm from "./EditCampaignForm";
-import DetailCampaign from "./DetailCampaign";
-import AddCampaignForm from "./AddCampaignForm";
-import gql from "graphql-tag";
-import { campaignClient } from "../utils/graphClients";
 import { convertDateNow } from "../utils/Date";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useHistory,
-} from "react-router-dom";
+
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 function createData(name, workspace, fromDate, toDate) {
   return { name, workspace, fromDate, toDate };
@@ -92,41 +81,8 @@ export default function EnhancedTable() {
   const [dense] = React.useState(false);
   const [openDetail, setOpenDetail] = React.useState(false);
   const [dataSelected, setDataSelected] = React.useState({});
-  const history = useHistory();
-  let searchRef = useRef();
 
-  const query = gql`
-    query($page: Int, $query: String) {
-      getListCampaign(page: $page, query: $query) {
-        listCampaign {
-          _id
-          name
-          email
-          googleAnalytics {
-            trackingId
-            isActive
-          }
-          createdAt
-          expiredAt
-          workspaceName
-        }
-        totalCampaign
-      }
-    }
-  `;
-  useEffect(() => {
-    campaignClient
-      .query({
-        query,
-        variables: { page: page, query: searchValue },
-        fetchPolicy: "no-cache",
-      })
-      .then((res) => {
-        console.log(res);
-        setCampaigns(res.data.getListCampaign.listCampaign);
-        setTotalCampains(res.data.getListCampaign.totalCampaign);
-      });
-  }, [query, page, searchValue]);
+  let searchRef = useRef();
 
   const [openEditForm, setOpenEditForm] = React.useState(false);
   const handlerClickOpen = () => {
@@ -181,36 +137,12 @@ export default function EnhancedTable() {
     setSearchValue(searchRef.value);
   };
 
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const openPop = Boolean(anchorEl);
   const id = openPop ? "simple-popover" : undefined;
   return (
     <div className={classes.root}>
-      <div className="search-input">
-        <TextField
-          className="search-input__input"
-          label="Search"
-          inputRef={(value) => (searchRef = value)}
-        ></TextField>
-        <Button
-          className="search__button"
-          onClick={() => {
-            handleSearch();
-          }}
-        >
-          <i className="fas fa-search "></i>
-        </Button>
-      </div>
-      <Button onClick={handleOpen}>+Add Campaign</Button>
       <Paper className={classes.paper}>
         <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer>
@@ -287,20 +219,8 @@ export default function EnhancedTable() {
                           }}
                         >
                           <Typography className={classes.typography}>
-                            <Button
-                              onClick={() => {
-                                handlerClickOpen();
-                              }}
-                            >
-                              Detail
-                            </Button>
-                            <Button
-                              onClick={() => {
-                                setOpenEditForm(true);
-                              }}
-                            >
-                              Edit
-                            </Button>
+                            <Button>Detail</Button>
+                            <Button>Edit</Button>
                           </Typography>
                         </Popover>
                         <Button
@@ -320,37 +240,6 @@ export default function EnhancedTable() {
           </Table>
         </TableContainer>
       </Paper>
-      {/* <Switch>
-          <Route
-            path={"/campaign-infomation"}
-            children={<CampaignInfomation />}
-          />
-        </Switch> */}
-      <DetailCampaign
-        campaign={dataSelected}
-        open={openDetail}
-        handleClose={handlerClose}
-      />
-      <EditCampaignForm
-        campaign={dataSelected}
-        open={openEditForm}
-        handleClose={setOpenEditForm}
-      />
-      <AddCampaignForm
-        open={open}
-        handleClose={handleClose}
-        campaigns={campaigns}
-        setCampaigns={setCampaigns}
-      />
-      <div className={classes.root + " page-wrapper"}>
-        <Pagination
-          count={Math.ceil(totalCampains / 10) || 1}
-          shape="rounded"
-          onChange={(e, newPage) => {
-            handlePage(newPage);
-          }}
-        />
-      </div>
     </div>
   );
 }
