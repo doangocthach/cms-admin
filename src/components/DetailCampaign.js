@@ -169,6 +169,7 @@ const EnableTrading = ({ open, handleClose, setEnableTrading, trackingId }) => {
 };
 
 export default ({ campaign, open, handleClose }) => {
+  console.log(campaign);
   const classes = useStyles();
   const [enableTrading, setEnableTrading] = React.useState(false);
   const [openTradingDialog, setOpenTradingDialog] = React.useState(false);
@@ -186,7 +187,6 @@ export default ({ campaign, open, handleClose }) => {
   };
 
   const handleOpenTrading = async () => {
-    console.log(campaign);
     const res = await campaignClient
       .mutate({
         mutation,
@@ -196,6 +196,9 @@ export default ({ campaign, open, handleClose }) => {
         setTrackingId(res.data.enableTracking);
       });
     console.log(res);
+  };
+  const handleViewTrading = (trackingId) => {
+    setTrackingId(trackingId);
   };
 
   return (
@@ -214,11 +217,12 @@ export default ({ campaign, open, handleClose }) => {
           <p>{campaign.workspaceName}</p>
           <Divider />
           <br />
-          {enableTrading ? (
+          {campaign && campaign.googleAnalytics ? (
             <Button
               className={classes.btn + " " + classes.dissable}
               onClick={() => {
                 setOpenTradingDialog(true);
+                handleViewTrading(campaign.googleAnalytics.trackingId);
               }}
             >
               View

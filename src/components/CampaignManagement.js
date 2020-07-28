@@ -108,6 +108,7 @@ export default function EnhancedTable() {
     }
   `;
   useEffect(() => {
+    console.log(campaigns)
     campaignClient
       .query({
         query,
@@ -235,7 +236,7 @@ export default function EnhancedTable() {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.name}
+                      key={row.id}
                       selected={isItemSelected}
                     >
                       <TableCell
@@ -331,7 +332,7 @@ export default function EnhancedTable() {
       />
       <div className={classes.root + " page-wrapper"}>
         <Pagination
-          count={Math.ceil(totalCampains / 10) || 1}
+          count={Math.ceil(totalCampains / 3) || 1}
           shape="rounded"
           onChange={(e, newPage) => {
             handlePage(newPage);

@@ -74,6 +74,8 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
     });
     const newCampaign = [...campaigns];
     newCampaign.pop();
+    console.log(newCampaign);
+    console.log([res.data.createCampaign, ...newCampaign]);
     setCampaigns([res.data.createCampaign, ...newCampaign]);
   };
   const classes = useStyles();
