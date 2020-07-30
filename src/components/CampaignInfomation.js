@@ -269,7 +269,7 @@ export default function EnhancedTable(props) {
   const getGaTrafficByDay = gql`
     query($campaignId: String) {
       getGaTrafficByDay(campaignId: $campaignId) {
-        day
+        date
         numberOfUser
       }
     }
