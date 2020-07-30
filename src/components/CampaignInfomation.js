@@ -16,11 +16,7 @@ import {
 import clsx from "clsx";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
-import {
-  Tooltip,
-  TableHead,
-  TableSortLabel,
-} from "@material-ui/core";
+import { Tooltip, TableHead, TableSortLabel } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import { lighten } from "@material-ui/core/styles";
@@ -55,11 +51,7 @@ export function EnhancedTableHead(props) {
     onRequestSort(event, property);
   };
 
-  
-
   return (
-
-
     <TableHead>
       <TableRow>
         <TableCell padding="checkbox">
@@ -114,25 +106,25 @@ const useToolbarStyles = makeStyles((theme) => ({
     flex: "1 1 100%",
   },
 }));
- function descendingComparator(a, b, orderBy) {
+function descendingComparator(a, b, orderBy) {
   // console.log(b[orderBy]);
 
   if (parseFloat(b[orderBy]) < parseFloat(a[orderBy])) {
     return -1;
   }
-  if (parseFloat(b[orderBy]) >parseFloat(a[orderBy])) {
+  if (parseFloat(b[orderBy]) > parseFloat(a[orderBy])) {
     return 1;
   }
   return 0;
 }
 
- function getComparator(order, orderBy) {
+function getComparator(order, orderBy) {
   return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
- function stableSort(array, comparator) {
+function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   // if (el.type === "date") {
   // }
@@ -146,7 +138,7 @@ const useToolbarStyles = makeStyles((theme) => ({
   return stabilizedThis.map((el) => el[0]);
 }
 
-function EnhancedTableToolbar (props)  {
+function EnhancedTableToolbar(props) {
   const classes = useToolbarStyles();
   const { numSelected } = props;
 
@@ -189,8 +181,7 @@ function EnhancedTableToolbar (props)  {
       )}
     </Toolbar>
   );
-};
-
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -247,6 +238,8 @@ export default function EnhancedTable(props) {
   const classes = useStyles();
   const [campaigns, setCampaigns] = useState([]);
   const [reports, setReports] = useState([]);
+  const [gaTraffic, setGaTraffic] = useState();
+  const [gaTrafficByDay, setGaTrafficByDay] = useState([]);
   const [totalAction, setTotalAction] = useState();
 
   const [order, setOrder] = React.useState("asc");
@@ -261,16 +254,23 @@ export default function EnhancedTable(props) {
 
   let searchRef = useRef();
 
-  const query = gql`
+  const getGaTraffic = gql`
     query($campaignId: String) {
       getGaTraffic(campaignId: $campaignId) {
-        pagePath
         pageviews
-        uniquePageviews
-        avgTimeOnPage
-        entrances
+        users
+        newUsers
+        sessions
+        avgSessionDuration
         bounceRate
-        exitRate
+      }
+    }
+  `;
+  const getGaTrafficByDay = gql`
+    query($campaignId: String) {
+      getGaTrafficByDay(campaignId: $campaignId) {
+        day
+        numberOfUser
       }
     }
   `;
@@ -278,12 +278,21 @@ export default function EnhancedTable(props) {
   useEffect(() => {
     campaignClient
       .query({
-        query,
+        query: getGaTraffic,
         variables: { campaignId: props.match.params.campaignId },
       })
       .then((res) => {
         console.log(res.data.getGaTraffic);
-        setReports(res.data.getGaTraffic);
+        setGaTraffic(res.data.getGaTraffic);
+      });
+    campaignClient
+      .query({
+        query: getGaTrafficByDay,
+        variables: { campaignId: props.match.params.campaignId },
+      })
+      .then((res) => {
+        console.log(res.data.getGaTrafficByDay);
+        setGaTrafficByDay(res.data.getGaTrafficByDay);
       });
   }, []);
 
@@ -340,7 +349,7 @@ export default function EnhancedTable(props) {
   };
 
   const [anchorEl, setAnchorEl] = React.useState(null);
- 
+
   const openPop = Boolean(anchorEl);
   const id = openPop ? "simple-popover" : undefined;
   const headCells = [
@@ -388,125 +397,126 @@ export default function EnhancedTable(props) {
     },
   ];
   return (
-    <div className={classes.root}>
-      <Paper className={classes.paper}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <TableContainer>
-          <Table
-            className={classes.table}
-            aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
-            aria-label="enhanced table"
-          >
-            <EnhancedTableHead
-              classes={classes}
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
-              rowCount={campaigns.length}
-              headCells={headCells}
-            />
-            <TableBody>
-              {stableSort(reports, getComparator(order, orderBy)).map(
-                (row, index) => {
-                  const isItemSelected = isSelected(row.name);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+    // <div className={classes.root}>
+    //   <Paper className={classes.paper}>
+    //     <EnhancedTableToolbar numSelected={selected.length} />
+    //     <TableContainer>
+    //       <Table
+    //         className={classes.table}
+    //         aria-labelledby="tableTitle"
+    //         size={dense ? "small" : "medium"}
+    //         aria-label="enhanced table"
+    //       >
+    //         <EnhancedTableHead
+    //           classes={classes}
+    //           numSelected={selected.length}
+    //           order={order}
+    //           orderBy={orderBy}
+    //           onSelectAllClick={handleSelectAllClick}
+    //           onRequestSort={handleRequestSort}
+    //           rowCount={campaigns.length}
+    //           headCells={headCells}
+    //         />
+    //         <TableBody>
+    //           {stableSort(reports, getComparator(order, orderBy)).map(
+    //             (row, index) => {
+    //               const isItemSelected = isSelected(row.name);
+    //               const labelId = `enhanced-table-checkbox-${index}`;
 
-                  return (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      selected={isItemSelected}
-                    >
-                      <TableCell
-                        padding="checkbox"
-                        onClick={(event) => handleClick(event, row.name)}
-                      >
-                        <Checkbox
-                          checked={isItemSelected}
-                          inputProps={{ "aria-labelledby": labelId }}
-                        />
-                      </TableCell>
-                      <TableCell
-                        component="th"
-                        id={labelId}
-                        scope="row"
-                        padding="none"
-                      >
-                        {/* <Link to={`/campaign-infomation/${row._id}`}> */}
-                        {row.pagePath}
-                        {/* </Link> */}
-                      </TableCell>
-                      <TableCell align="left">
-                        {Math.round(row.pageviews)}
-                        <span className={classes.miniContent}>
-                          (
-                          {average(row.pageviews, reports, "pageviews").toFixed(
-                            2
-                          )}{" "}
-                          %)
-                        </span>
-                      </TableCell>
-                      <TableCell align="left">
-                        {row.uniquePageviews}{" "}
-                        <span className={classes.miniContent}>
-                          (
-                          {average(
-                            row.uniquePageviews,
-                            reports,
-                            "uniquePageviews"
-                          ).toFixed(2)}{" "}
-                          %)
-                        </span>
-                      </TableCell>
-                      <TableCell align="left">
-                        {convertSecondToMHSTime(parseInt(row.avgTimeOnPage))}
-                      </TableCell>
-                      <TableCell align="left">
-                        {row.entrances}
-                        <span className={classes.miniContent}>
-                          (
-                          {average(row.entrances, reports, "entrances").toFixed(
-                            2
-                          )}{" "}
-                          %)
-                        </span>
-                      </TableCell>
-                      <TableCell align="left">
-                        {row.bounceRate}
-                        <span className={classes.miniContent}>
-                          (
-                          {average(
-                            row.bounceRate,
-                            reports,
-                            "bounceRate"
-                          ).toFixed(2)}{" "}
-                          %)
-                        </span>
-                      </TableCell>
-                      <TableCell align="left">
-                        {Math.round(row.exitRate)}
-                        <span className={classes.miniContent}>
-                          (
-                          {average(row.exitRate, reports, "exitRate").toFixed(
-                            2
-                          )}{" "}
-                          %)
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  );
-                }
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
-    </div>
+    //               return (
+    //                 <TableRow
+    //                   hover
+    //                   role="checkbox"
+    //                   aria-checked={isItemSelected}
+    //                   tabIndex={-1}
+    //                   key={row.id}
+    //                   selected={isItemSelected}
+    //                 >
+    //                   <TableCell
+    //                     padding="checkbox"
+    //                     onClick={(event) => handleClick(event, row.name)}
+    //                   >
+    //                     <Checkbox
+    //                       checked={isItemSelected}
+    //                       inputProps={{ "aria-labelledby": labelId }}
+    //                     />
+    //                   </TableCell>
+    //                   <TableCell
+    //                     component="th"
+    //                     id={labelId}
+    //                     scope="row"
+    //                     padding="none"
+    //                   >
+    //                     {/* <Link to={`/campaign-infomation/${row._id}`}> */}
+    //                     {row.pagePath}
+    //                     {/* </Link> */}
+    //                   </TableCell>
+    //                   <TableCell align="left">
+    //                     {Math.round(row.pageviews)}
+    //                     <span className={classes.miniContent}>
+    //                       (
+    //                       {average(row.pageviews, reports, "pageviews").toFixed(
+    //                         2
+    //                       )}{" "}
+    //                       %)
+    //                     </span>
+    //                   </TableCell>
+    //                   <TableCell align="left">
+    //                     {row.uniquePageviews}{" "}
+    //                     <span className={classes.miniContent}>
+    //                       (
+    //                       {average(
+    //                         row.uniquePageviews,
+    //                         reports,
+    //                         "uniquePageviews"
+    //                       ).toFixed(2)}{" "}
+    //                       %)
+    //                     </span>
+    //                   </TableCell>
+    //                   <TableCell align="left">
+    //                     {convertSecondToMHSTime(parseInt(row.avgTimeOnPage))}
+    //                   </TableCell>
+    //                   <TableCell align="left">
+    //                     {row.entrances}
+    //                     <span className={classes.miniContent}>
+    //                       (
+    //                       {average(row.entrances, reports, "entrances").toFixed(
+    //                         2
+    //                       )}{" "}
+    //                       %)
+    //                     </span>
+    //                   </TableCell>
+    //                   <TableCell align="left">
+    //                     {row.bounceRate}
+    //                     <span className={classes.miniContent}>
+    //                       (
+    //                       {average(
+    //                         row.bounceRate,
+    //                         reports,
+    //                         "bounceRate"
+    //                       ).toFixed(2)}{" "}
+    //                       %)
+    //                     </span>
+    //                   </TableCell>
+    //                   <TableCell align="left">
+    //                     {Math.round(row.exitRate)}
+    //                     <span className={classes.miniContent}>
+    //                       (
+    //                       {average(row.exitRate, reports, "exitRate").toFixed(
+    //                         2
+    //                       )}{" "}
+    //                       %)
+    //                     </span>
+    //                   </TableCell>
+    //                 </TableRow>
+    //               );
+    //             }
+    //           )}
+    //         </TableBody>
+    //       </Table>
+    //     </TableContainer>
+    //   </Paper>
+    // </div>
+    <></>
   );
 }
