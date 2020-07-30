@@ -240,6 +240,7 @@ export default function EnhancedTable(props) {
   const [reports, setReports] = useState([]);
   const [gaTraffic, setGaTraffic] = useState();
   const [gaTrafficByDay, setGaTrafficByDay] = useState([]);
+  const [gaSources, setGaSources] = useState([]);
   const [totalAction, setTotalAction] = useState();
 
   const [order, setOrder] = React.useState("asc");
@@ -274,6 +275,19 @@ export default function EnhancedTable(props) {
       }
     }
   `;
+  const getSources = gql`
+    query($campaignId: String) {
+      getSources(campaignId: $campaignId) {
+        sourceMedium
+        users
+        newUsers
+        sessions
+        bounceRate
+        pageviewsPerSession
+        avgSessionDuration
+      }
+    }
+  `;
 
   useEffect(() => {
     campaignClient
@@ -293,6 +307,15 @@ export default function EnhancedTable(props) {
       .then((res) => {
         console.log(res.data.getGaTrafficByDay);
         setGaTrafficByDay(res.data.getGaTrafficByDay);
+      });
+    campaignClient
+      .query({
+        query: getSources,
+        variables: { campaignId: props.match.params.campaignId },
+      })
+      .then((res) => {
+        console.log(res.data.getSources);
+        setGaSources(res.data.getSources);
       });
   }, []);
 
