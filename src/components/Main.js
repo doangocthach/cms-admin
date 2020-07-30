@@ -143,8 +143,8 @@ export default (props) => {
             <Route path={"/workspaces"} children={<WorkSpaceManagement />} />
             <Route path={"/campaigns"} children={<CampaignManagement />} />
             <Route
-              path={"/campaign-infomation"}
-              children={<CampaignInfomation />}
+              path={"/campaign-infomation/:campaignId"}
+              component={CampaignInfomation}
             />
           </Switch>
         </main>

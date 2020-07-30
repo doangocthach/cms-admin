@@ -104,6 +104,7 @@ export default function EnhancedTable() {
           email
           googleAnalytics {
             trackingId
+            viewId
             isActive
           }
           createdAt
@@ -115,7 +116,6 @@ export default function EnhancedTable() {
     }
   `;
   useEffect(() => {
-    console.log(campaigns)
     campaignClient
       .query({
         query,
@@ -123,7 +123,6 @@ export default function EnhancedTable() {
         fetchPolicy: "no-cache",
       })
       .then((res) => {
-        console.log(res);
         setCampaigns(res.data.getListCampaign.listCampaign);
         setTotalCampains(res.data.getListCampaign.totalCampaign);
       });
@@ -261,7 +260,9 @@ export default function EnhancedTable() {
                         scope="row"
                         padding="none"
                       >
-                        <Link to="/campaign-infomation">{row.name}</Link>
+                        <Link to={`/campaign-infomation/${row._id}`}>
+                          {row.name}
+                        </Link>
                       </TableCell>
                       <TableCell align="left">{row.workspaceName}</TableCell>
                       <TableCell align="left">
