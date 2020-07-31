@@ -26,7 +26,7 @@
     "react-highlight.js": "^1.0.7",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
-    "zingchart-react": "^2.0.0"
+    "recharts": "^1.8.5"
   },
   "peerDependencies": {
     "@date-io/core": "^1.3.6"

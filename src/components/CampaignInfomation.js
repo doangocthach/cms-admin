@@ -12,6 +12,7 @@ import {
   Popover,
   Typography,
   Button,
+  useTheme,
 } from "@material-ui/core";
 import clsx from "clsx";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -23,12 +24,13 @@ import { lighten } from "@material-ui/core/styles";
 // import EnhancedTableToolbar, {
 //   getComparator,
 // } from "./HeadTable";
-import ZingChart from "zingchart-react";
+
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import { campaignClient } from "../utils/graphClients";
 import gql from "graphql-tag";
+import Chart from "./Chart";
 import {
   BrowserRouter as Router,
   Switch,
@@ -344,7 +346,7 @@ const headCells = [
     label: "Avg. Sesson  Duration",
   },
 ];
-export default function EnhancedTable(props) {
+export default (props) => {
   console.log(props.match.params.campaignId);
   const classes = useStyles();
   const [campaigns, setCampaigns] = useState([]);
@@ -389,27 +391,6 @@ export default function EnhancedTable(props) {
     expiredAt: new Date(),
   });
 
-  const [state, setstate] = useState({
-    config: {
-      type: "line",
-      "scale-y": {
-        label: {
-          text: "Users",
-        },
-      },
-      "scale-x": {
-        labels: top.map((e) => converMonth(e.date)),
-        label: {
-          text: "Time",
-        },
-      },
-      series: [
-        {
-          values: top.map((e) => e.numberOfUser),
-        },
-      ],
-    },
-  });
   const chart = React.createRef();
   let searchRef = useRef();
 
@@ -490,35 +471,35 @@ export default function EnhancedTable(props) {
     setSearchValue(searchRef.value);
   };
 
-  useEffect(() => {
-    campaignClient
-      .query({
-        query: getGaTraffic,
-        variables: { campaignId: props.match.params.campaignId },
-      })
-      .then((res) => {
-        console.log(res.data.getGaTraffic);
-        setGaTraffic(res.data.getGaTraffic);
-      });
-    campaignClient
-      .query({
-        query: getGaTrafficByDay,
-        variables: { campaignId: props.match.params.campaignId },
-      })
-      .then((res) => {
-        console.log(res.data.getGaTrafficByDay);
-        setGaTrafficByDay(res.data.getGaTrafficByDay);
-      });
-    campaignClient
-      .query({
-        query: getSources,
-        variables: { campaignId: props.match.params.campaignId },
-      })
-      .then((res) => {
-        console.log(res.data.getSources);
-        setGaSources(res.data.getSources);
-      });
-  }, []);
+  // useEffect(() => {
+  //   campaignClient
+  //     .query({
+  //       query: getGaTraffic,
+  //       variables: { campaignId: props.match.params.campaignId },
+  //     })
+  //     .then((res) => {
+  //       console.log(res.data.getGaTraffic);
+  //       setGaTraffic(res.data.getGaTraffic);
+  //     });
+  //   campaignClient
+  //     .query({
+  //       query: getGaTrafficByDay,
+  //       variables: { campaignId: props.match.params.campaignId },
+  //     })
+  //     .then((res) => {
+  //       console.log(res.data.getGaTrafficByDay);
+  //       setGaTrafficByDay(res.data.getGaTrafficByDay);
+  //     });
+  //   campaignClient
+  //     .query({
+  //       query: getSources,
+  //       variables: { campaignId: props.match.params.campaignId },
+  //     })
+  //     .then((res) => {
+  //       console.log(res.data.getSources);
+  //       setGaSources(res.data.getSources);
+  //     });
+  // }, []);
 
   return (
     <React.Fragment>
@@ -550,10 +531,7 @@ export default function EnhancedTable(props) {
           }}
         />
       </MuiPickersUtilsProvider>
-      <div>
-        <div>{state.series}</div>
-        <ZingChart ref={chart} data={state.config} series={state.series} />
-      </div>
+      <Chart />
       <div className={classes.wrapperAnalytics}>
         {Object.entries(bot).map(
           ([key, value]) =>
@@ -700,7 +678,7 @@ export default function EnhancedTable(props) {
       </div>
     </React.Fragment>
   );
-}
+};
 
 const converKey = (key, value) => {
   if (key === "bounceRate") {
