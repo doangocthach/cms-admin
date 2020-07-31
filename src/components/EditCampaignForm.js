@@ -46,7 +46,7 @@ export default ({ campaign, open, handleClose }) => {
   const [state, setstate] = React.useState({
     name: "",
     workspace: "",
-    date: "",
+    date: new Date(),
   });
   return (
     <React.Fragment>

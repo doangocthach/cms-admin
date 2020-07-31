@@ -31,8 +31,8 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
   const [state, setState] = useState({
     name: "",
     email: "",
-    createdAt: "",
-    expiredAt: "",
+    createdAt: new Date(),
+    expiredAt: new Date(),
   });
 
   const handleFormSubmit = async (e) => {
