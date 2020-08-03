@@ -29,11 +29,7 @@ export function EnhancedTableHead(props) {
     onRequestSort(event, property);
   };
 
-  
-
   return (
-
-
     <TableHead>
       <TableRow>
         <TableCell padding="checkbox">
@@ -156,7 +152,7 @@ export default (props) => {
       ) : (
         <Tooltip title="Filter list">
           <IconButton aria-label="filter list">
-            <FilterListIcon />
+            {/* <FilterListIcon /> */}
           </IconButton>
         </Tooltip>
       )}

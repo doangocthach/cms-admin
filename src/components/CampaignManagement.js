@@ -49,6 +49,12 @@ const headCells = [
     disablePadding: false,
     label: "Workspace",
   },
+  {
+    id: "email",
+    numeric: false,
+    disablePadding: false,
+    label: "Email",
+  },
   { id: "fromDate", numeric: false, disablePadding: false, label: "From" },
   { id: "toDate", numeric: false, disablePadding: false, label: "To" },
 ];
@@ -145,7 +151,7 @@ export default function EnhancedTable() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = campaigns.map((n) => n.name);
+      const newSelecteds = campaigns.map((n) => n._id);
       setSelected(newSelecteds);
       return;
     }
@@ -211,9 +217,9 @@ export default function EnhancedTable() {
         </Button>
       </div>
       <Button onClick={handleOpen}>+Add Campaign</Button>
-      <Paper className={classes.paper}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <TableContainer>
+      <EnhancedTableToolbar numSelected={selected.length} />
+      <TableContainer>
+        <Paper className={classes.paper}>
           <Table
             className={classes.table}
             aria-labelledby="tableTitle"
@@ -233,21 +239,21 @@ export default function EnhancedTable() {
             <TableBody>
               {stableSort(campaigns, getComparator(order, orderBy)).map(
                 (row, index) => {
-                  const isItemSelected = isSelected(row.name);
+                  // console.log(row);
+                  const isItemSelected = isSelected(row._id);
                   const labelId = `enhanced-table-checkbox-${index}`;
-
                   return (
                     <TableRow
                       hover
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.id}
+                      key={row._id}
                       selected={isItemSelected}
                     >
                       <TableCell
                         padding="checkbox"
-                        onClick={(event) => handleClick(event, row.name)}
+                        onClick={(event) => handleClick(event, row._id)}
                       >
                         <Checkbox
                           checked={isItemSelected}
@@ -265,6 +271,7 @@ export default function EnhancedTable() {
                         </Link>
                       </TableCell>
                       <TableCell align="left">{row.workspaceName}</TableCell>
+                      <TableCell align="left">{row.email}</TableCell>
                       <TableCell align="left">
                         {convertDateNow(row.createdAt)}
                       </TableCell>
@@ -320,8 +327,8 @@ export default function EnhancedTable() {
               )}
             </TableBody>
           </Table>
-        </TableContainer>
-      </Paper>
+        </Paper>
+      </TableContainer>
       {/* <Switch>
           <Route
             path={"/campaign-infomation"}

@@ -165,6 +165,7 @@ export default (props) => {
     <React.Fragment>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <KeyboardDatePicker
+          autoOk
           margin="normal"
           id="date-picker-dialog"
           label="Date picker dialog"
@@ -178,6 +179,7 @@ export default (props) => {
           }}
         />
         <KeyboardDatePicker
+          autoOk
           margin="normal"
           id="date-picker-dialog"
           label="Date picker dialog"
@@ -191,7 +193,9 @@ export default (props) => {
           }}
         />
       </MuiPickersUtilsProvider>
-      <Chart />
+      <di>
+        <Chart />
+      </di>
       <div className={classes.wrapperAnalytics}>
         {Object.entries(bot).map(
           ([key, value]) =>

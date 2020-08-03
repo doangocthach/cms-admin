@@ -175,7 +175,6 @@ const EnableTrading = ({ open, handleClose, setEnableTrading, trackingId }) => {
 };
 
 export default ({ campaign, open, handleClose }) => {
-  console.log(campaign);
   const classes = useStyles();
   const [enableTrading, setEnableTrading] = React.useState(false);
   const [openTradingDialog, setOpenTradingDialog] = React.useState(false);

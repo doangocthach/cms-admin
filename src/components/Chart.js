@@ -41,17 +41,13 @@ const top = [
     date: "20200729",
     numberOfUser: 6,
   },
-  {
-    date: "20200730",
-    numberOfUser: 6,
-  },
 ];
 
 export default () => {
   const theme = useTheme();
   return (
     <React.Fragment>
-      <LineChart width={700} height={300} data={top}>
+      <LineChart width={700} height={300} data={top} margin={12}>
         <XAxis
           dataKey={(data) => {
             return converMonth(data.date);
