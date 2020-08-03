@@ -33,9 +33,6 @@ import {
   useHistory,
 } from "react-router-dom";
 
-function createData(name, workspace, fromDate, toDate) {
-  return { name, workspace, fromDate, toDate };
-}
 const headCells = [
   {
     id: "name",
@@ -44,13 +41,18 @@ const headCells = [
     label: "Name",
   },
   {
-    id: "workspace",
+    id: "workspaceName",
     numeric: false,
     disablePadding: false,
     label: "Workspace",
   },
-  { id: "fromDate", numeric: false, disablePadding: false, label: "From" },
-  { id: "toDate", numeric: false, disablePadding: false, label: "To" },
+  {
+    id: "createdAt",
+    numeric: false,
+    disablePadding: false,
+    label: "Created Date",
+  },
+  { id: "expiredAt", numeric: false, disablePadding: false, label: "To" },
 ];
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -109,13 +111,13 @@ export default function EnhancedTable() {
           }
           createdAt
           expiredAt
-          workspaceName
         }
         totalCampaign
       }
     }
   `;
   useEffect(() => {
+    console.log("dm");
     campaignClient
       .query({
         query,
@@ -264,7 +266,7 @@ export default function EnhancedTable() {
                           {row.name}
                         </Link>
                       </TableCell>
-                      <TableCell align="left">{row.workspaceName}</TableCell>
+                      <TableCell align="left">{row.email}</TableCell>
                       <TableCell align="left">
                         {convertDateNow(row.createdAt)}
                       </TableCell>
@@ -346,7 +348,7 @@ export default function EnhancedTable() {
       />
       <div className={classes.root + " page-wrapper"}>
         <Pagination
-          count={Math.ceil(totalCampains / 3) || 1}
+          count={Math.ceil(totalCampains / 10) || 1}
           shape="rounded"
           onChange={(e, newPage) => {
             handlePage(newPage);

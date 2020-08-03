@@ -69,7 +69,7 @@ const headCells = [
     id: "createdAt",
     numeric: false,
     disablePadding: true,
-    label: "Created Date"
+    label: "Created Date",
   },
 ];
 
@@ -117,7 +117,7 @@ export default function ListWorkspace() {
         setWorkspace(res.data.getListWorkspace.listWorkspace);
         setTotalWorkspace(res.data.getListWorkspace.totalWorkspace);
       });
-  }, [query, page, searchValue]);
+  }, [workspaces, query, page, searchValue]);
 
   const handleSearch = () => {
     setSearchValue(searchRef.value);

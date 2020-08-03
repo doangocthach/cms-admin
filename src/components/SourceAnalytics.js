@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Checkbox,
   TableRow,
@@ -19,7 +19,8 @@ import clsx from "clsx";
 import { Tooltip, TableHead, TableSortLabel } from "@material-ui/core";
 import { DeleteIcon } from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
-
+import { campaignClient } from "../utils/graphClients";
+import gql from "graphql-tag";
 import { lighten } from "@material-ui/core/styles";
 
 function descendingComparator(a, b, orderBy) {
@@ -73,50 +74,7 @@ const useToolbarStyles = makeStyles((theme) => ({
     flex: "1 1 100%",
   },
 }));
-function EnhancedTableToolbar(props) {
-  const classes = useToolbarStyles();
-  const { numSelected } = props;
 
-  return (
-    <Toolbar
-      className={clsx(classes.root, {
-        [classes.highlight]: numSelected > 0,
-      })}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          className={classes.title}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          className={classes.title}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        ></Typography>
-      )}
-
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton aria-label="delete">
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton aria-label="filter list">
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Toolbar>
-  );
-}
 const converStringToFloat = (string, fixNumber) => {
   return parseFloat(string);
 };
@@ -125,13 +83,11 @@ const average = (currentValue, array, field) => {
     currentValue = converStringToFloat(currentValue, 2);
   }
   let total = 0;
-  console.log(typeof currentValue);
   if (Array.isArray(array)) {
     array.forEach((element) => {
       total += converStringToFloat(element[`${field}`], 2);
     });
   }
-  console.log(typeof total);
   return (currentValue / total) * 100;
 };
 
@@ -151,18 +107,12 @@ export function EnhancedTableHead(props) {
   };
 
   return (
-    <TableHead>
-      <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{ "aria-label": "select all desserts" }}
-          />
-        </TableCell>
+    <TableHead >
+      <TableRow >
+       
         {headCells.map((headCell) => (
           <TableCell
+          className={classes.tableHead}
             key={headCell.id}
             align={headCell.numeric ? "right" : "left"}
             padding={headCell.disablePadding ? "none" : "default"}
@@ -193,6 +143,7 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     width: "100%",
     marginBottom: theme.spacing(2),
+    padding: "1rem"
   },
   table: {
     minWidth: 750,
@@ -220,6 +171,14 @@ const useStyles = makeStyles((theme) => ({
     minWidth: "200px",
     margin: theme.spacing(2),
   },
+  miniContent: {
+    opacity: "0.85",
+    fontSize: "80%",
+    margin: 0
+  },
+  tableHead:{
+    fontWeight: "bold"
+  }
 }));
 const convertSecondToMHSTime = (second) => {
   var measuredTime = new Date(null);
@@ -273,35 +232,37 @@ const headCells = [
   },
 ];
 
-export default () => {
-  const [reports, setReports] = useState([
-    {
-      sourceMedium: "(direct) / (none)",
-      users: 6,
-      newUsers: 6,
-      sessions: 13,
-      bounceRate: "23.076923076923077",
-      pageviewsPerSession: "19.53846153846154",
-      avgSessionDuration: "2255.0",
-      __typename: "getSources",
-    },
-    {
-      sourceMedium: "l.facebook.com / referral",
-      users: 1,
-      newUsers: 0,
-      sessions: 1,
-      bounceRate: "0.0",
-      pageviewsPerSession: "2.0",
-      avgSessionDuration: "1411.0",
-      __typename: "getSources",
-    },
-  ]);
+export default ({ campaignId }) => {
+  const getSources = gql`
+    query($campaignId: String) {
+      getSources(campaignId: $campaignId) {
+        sourceMedium
+        users
+        newUsers
+        sessions
+        bounceRate
+        pageviewsPerSession
+        avgSessionDuration
+      }
+    }
+  `;
+  const [gaSources, setGaSources] = useState([]);
   const [selected, setSelected] = React.useState([]);
   const [dense] = React.useState(false);
-  const [campaigns, setCampaigns] = useState([]);
-
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
+
+  useEffect(() => {
+    campaignClient
+      .query({
+        query: getSources,
+        variables: { campaignId: campaignId },
+      })
+      .then((res) => {
+        console.log(res.data.getSources);
+        setGaSources(res.data.getSources);
+      });
+  }, []);
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   const handleRequestSort = (event, property) => {
@@ -331,7 +292,7 @@ export default () => {
   };
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = campaigns.map((n) => n.name);
+      const newSelecteds = gaSources.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -342,7 +303,7 @@ export default () => {
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+  
         <TableContainer>
           <Table
             className={classes.table}
@@ -357,11 +318,11 @@ export default () => {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={campaigns.length}
+              rowCount={gaSources.length}
               headCells={headCells}
             />
             <TableBody>
-              {stableSort(reports, getComparator(order, orderBy)).map(
+              {stableSort(gaSources, getComparator(order, orderBy)).map(
                 (row, index) => {
                   const isItemSelected = isSelected(row.sourceMedium);
                   const labelId = `enhanced-table-checkbox-${index}`;
@@ -371,20 +332,11 @@ export default () => {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.id}
+                      key={index}
+                    
                       selected={isItemSelected}
                     >
-                      <TableCell
-                        padding="checkbox"
-                        onClick={(event) =>
-                          handleClick(event, row.sourceMedium)
-                        }
-                      >
-                        <Checkbox
-                          checked={isItemSelected}
-                          inputProps={{ "aria-labelledby": labelId }}
-                        />
-                      </TableCell>
+                  
                       <TableCell
                         component="th"
                         id={labelId}
@@ -397,53 +349,54 @@ export default () => {
                       </TableCell>
                       <TableCell align="left">
                         {Math.round(row.users)}
-                        <span className={classes.miniContent}>
-                          ({average(row.users, reports, "users").toFixed(2)} %)
-                        </span>
+                        <p className={classes.miniContent}>
+                          ({average(row.users, gaSources, "users").toFixed(2)}{" "}
+                          %)
+                        </p>
                       </TableCell>
                       <TableCell align="left">
                         {row.newUsers}{" "}
-                        <span className={classes.miniContent}>
+                        <p className={classes.miniContent}>
                           (
-                          {average(row.newUsers, reports, "newUsers").toFixed(
+                          {average(row.newUsers, gaSources, "newUsers").toFixed(
                             2
                           )}{" "}
                           %)
-                        </span>
+                        </p>
                       </TableCell>
                       <TableCell align="left">
                         {row.sessions}{" "}
-                        <span className={classes.miniContent}>
+                        <p className={classes.miniContent}>
                           (
-                          {average(row.sessions, reports, "sessions").toFixed(
+                          {average(row.sessions, gaSources, "sessions").toFixed(
                             2
                           )}{" "}
                           %)
-                        </span>
+                        </p>
                       </TableCell>
                       <TableCell align="left">
                         {parseFloat(row.bounceRate).toFixed(2)}{" "}
-                        <span className={classes.miniContent}>
+                        <p className={classes.miniContent}>
                           (
                           {average(
                             row.bounceRate,
-                            reports,
+                            gaSources,
                             "bounceRate"
                           ).toFixed(2)}{" "}
                           %)
-                        </span>
+                        </p>
                       </TableCell>
                       <TableCell align="left">
                         {parseFloat(row.pageviewsPerSession).toFixed(2)}{" "}
-                        <span className={classes.miniContent}>
+                        <p className={classes.miniContent}>
                           (
                           {average(
                             row.pageviewsPerSession,
-                            reports,
+                            gaSources,
                             "pageviewsPerSession"
                           ).toFixed(2)}{" "}
                           %)
-                        </span>
+                        </p>
                       </TableCell>
                       <TableCell align="left">
                         {convertSecondToMHSTime(

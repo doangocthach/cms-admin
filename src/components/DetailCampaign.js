@@ -220,7 +220,7 @@ export default ({ campaign, open, handleClose }) => {
           <p>{campaign.name}</p>
           <Divider />
           <h3>Workspace</h3>
-          <p>{campaign.workspaceName}</p>
+          <p>{campaign.email}</p>
           <Divider />
           <br />
           {campaign && campaign.googleAnalytics ? (

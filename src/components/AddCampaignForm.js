@@ -31,8 +31,8 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
   const [state, setState] = useState({
     name: "",
     email: "",
-    createdAt: new Date(),
-    expiredAt: new Date(),
+    createdAt: Date.now(),
+    expiredAt: new Date().setDate(new Date().getDate() + 1),
   });
 
   const handleFormSubmit = async (e) => {
@@ -59,7 +59,6 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
           }
           createdAt
           expiredAt
-          workspaceName
         }
       }
     `;
@@ -73,8 +72,9 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
       },
     });
     const newCampaign = [...campaigns];
-    newCampaign.pop();
-    console.log(newCampaign);
+    if (newCampaign.length >= 10) {
+      newCampaign.pop();
+    }
     console.log([res.data.createCampaign, ...newCampaign]);
     setCampaigns([res.data.createCampaign, ...newCampaign]);
   };
@@ -112,6 +112,7 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
           />
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <KeyboardDatePicker
+              autoOk
               variant="inline"
               format="MM/dd/yyyy"
               margin="normal"
@@ -126,6 +127,7 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
               }}
             />
             <KeyboardDatePicker
+              autoOk
               variant="inline"
               format="MM/dd/yyyy"
               margin="normal"

@@ -31,7 +31,10 @@ export default ({ open, handleClose, workspaces, setWorkspace }) => {
     `;
     const res = await workspaceClient.mutate({ mutation, variables: state });
     const newWorkspace = [...workspaces];
-    newWorkspace.pop();
+    if (newWorkspace.length >= 10) {
+      newWorkspace.pop();
+    }
+
     setWorkspace([res.data.createWorkspace, ...newWorkspace]);
   };
   const useStyles = makeStyles((theme) => ({

@@ -60,31 +60,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const bot = {
-  pageviews: 168,
-  users: 5,
-  newUsers: 5,
-  sessions: 11,
-  avgSessionDuration: "2281.090909090909",
-  bounceRate: "27.27272727272727",
-  __typename: "PageGa",
-};
-
 export default (props) => {
-  console.log(props.match.params.campaignId);
+  const campaignId = props.match.params.campaignId;
   const classes = useStyles();
 
-  const [gaTraffic, setGaTraffic] = useState();
-  const [gaTrafficByDay, setGaTrafficByDay] = useState([]);
-  const [gaSources, setGaSources] = useState([]);
+  const [gaTraffic, setGaTraffic] = useState([]);
   const [totalAction, setTotalAction] = useState();
 
   const [page, setPage] = useState(1);
   const [searchValue, setSearchValue] = useState("");
 
   const [dateSelected, setDateSelected] = useState({
-    createdAt: new Date(),
-    expiredAt: new Date(),
+    createdAt: new Date(new Date().setDate(new Date().getDate() - 3)).getTime(),
+    expiredAt: new Date().getTime(),
   });
 
   const chart = React.createRef();
@@ -102,27 +90,6 @@ export default (props) => {
       }
     }
   `;
-  const getGaTrafficByDay = gql`
-    query($campaignId: String) {
-      getGaTrafficByDay(campaignId: $campaignId) {
-        date
-        numberOfUser
-      }
-    }
-  `;
-  const getSources = gql`
-    query($campaignId: String) {
-      getSources(campaignId: $campaignId) {
-        sourceMedium
-        users
-        newUsers
-        sessions
-        bounceRate
-        pageviewsPerSession
-        avgSessionDuration
-      }
-    }
-  `;
 
   const handlePage = (newPage) => {
     setPage(newPage);
@@ -131,35 +98,18 @@ export default (props) => {
     setSearchValue(searchRef.value);
   };
 
-  // useEffect(() => {
-  //   campaignClient
-  //     .query({
-  //       query: getGaTraffic,
-  //       variables: { campaignId: props.match.params.campaignId },
-  //     })
-  //     .then((res) => {
-  //       console.log(res.data.getGaTraffic);
-  //       setGaTraffic(res.data.getGaTraffic);
-  //     });
-  //   campaignClient
-  //     .query({
-  //       query: getGaTrafficByDay,
-  //       variables: { campaignId: props.match.params.campaignId },
-  //     })
-  //     .then((res) => {
-  //       console.log(res.data.getGaTrafficByDay);
-  //       setGaTrafficByDay(res.data.getGaTrafficByDay);
-  //     });
-  //   campaignClient
-  //     .query({
-  //       query: getSources,
-  //       variables: { campaignId: props.match.params.campaignId },
-  //     })
-  //     .then((res) => {
-  //       console.log(res.data.getSources);
-  //       setGaSources(res.data.getSources);
-  //     });
-  // }, []);
+  useEffect(() => {
+    campaignClient
+      .query({
+        query: getGaTraffic,
+        variables: {
+          campaignId: props.match.params.campaignId,
+        },
+      })
+      .then((res) => {
+        setGaTraffic(res.data.getGaTraffic);
+      });
+  }, []);
 
   return (
     <React.Fragment>
@@ -191,12 +141,12 @@ export default (props) => {
           }}
         />
       </MuiPickersUtilsProvider>
-      <Chart />
+      <Chart campaignId={campaignId} dateSelected={dateSelected} />
       <div className={classes.wrapperAnalytics}>
-        {Object.entries(bot).map(
+        {Object.entries(gaTraffic).map(
           ([key, value]) =>
             key !== "__typename" && (
-              <Card className={classes.rootCard}>
+              <Card className={classes.rootCard} key={key}>
                 {
                   <CardContent>
                     <Typography
@@ -215,7 +165,7 @@ export default (props) => {
             )
         )}
       </div>
-      <SourceAnalytics />
+      <SourceAnalytics campaignId={campaignId} />
     </React.Fragment>
   );
 };
