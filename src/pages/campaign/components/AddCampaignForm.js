@@ -1,7 +1,5 @@
 import "date-fns";
 import React, { useState } from "react";
-import axios from "../utils/axios";
-import { useHistory } from "react-router-dom";
 import {
   TextField,
   Button,
@@ -18,66 +16,15 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-import { campaignClient } from "../utils/graphClients";
-import gql from "graphql-tag";
 
+import { useStoreActions, useStoreState } from "easy-peasy";
 const useStyles = makeStyles((theme) => ({
   dialog: {
     display: "flex",
     flexFlow: "column",
   },
 }));
-export default ({ open, handleClose, campaigns, setCampaigns }) => {
-  const [state, setState] = useState({
-    name: "",
-    email: "",
-    createdAt: new Date(),
-    expiredAt: new Date(),
-  });
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    const mutation = gql`
-      mutation(
-        $name: String
-        $email: String
-        $createdAt: String
-        $expiredAt: String
-      ) {
-        createCampaign(
-          name: $name
-          email: $email
-          createdAt: $createdAt
-          expiredAt: $expiredAt
-        ) {
-          _id
-          name
-          email
-          googleAnalytics {
-            trackingId
-            isActive
-          }
-          createdAt
-          expiredAt
-          workspaceName
-        }
-      }
-    `;
-    const res = await campaignClient.mutate({
-      mutation,
-      variables: {
-        name: state.name,
-        email: state.email,
-        createdAt: state.createdAt.toString(),
-        expiredAt: state.expiredAt.toString(),
-      },
-    });
-    const newCampaign = [...campaigns];
-    newCampaign.pop();
-    console.log(newCampaign);
-    console.log([res.data.createCampaign, ...newCampaign]);
-    setCampaigns([res.data.createCampaign, ...newCampaign]);
-  };
+export default ({ handleClose, setState, state, handleFormSubmit, open }) => {
   const classes = useStyles();
   return (
     <Dialog
@@ -112,6 +59,7 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
           />
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <KeyboardDatePicker
+              autoOk
               variant="inline"
               format="MM/dd/yyyy"
               margin="normal"
@@ -126,6 +74,7 @@ export default ({ open, handleClose, campaigns, setCampaigns }) => {
               }}
             />
             <KeyboardDatePicker
+              autoOk
               variant="inline"
               format="MM/dd/yyyy"
               margin="normal"

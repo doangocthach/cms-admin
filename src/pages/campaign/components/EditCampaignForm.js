@@ -43,11 +43,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default ({ campaign, open, handleClose }) => {
   const classes = useStyles();
-  const [state, setstate] = React.useState({
-    name: "",
-    workspace: "",
-    date: new Date(),
-  });
+  // const [state, setstate] = React.useState({
+  //   name: "",
+  //   workspace: "",
+  //   date: new Date(),
+  // });
   return (
     <React.Fragment>
       <Dialog

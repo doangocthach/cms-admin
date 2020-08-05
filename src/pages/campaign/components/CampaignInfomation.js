@@ -1,22 +1,19 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Pagination } from "@material-ui/lab";
+import React, { useState, useEffect } from "react";
+// import { Pagination } from "@material-ui/lab";
 import { makeStyles, Typography, CardContent } from "@material-ui/core";
 
-import SourceAnalytics from "./SourceAnalytics";
+import SourceAnalyticsContainer from "../container/SourceAnalyticsContainer";
 import Card from "@material-ui/core/Card";
-import { campaignClient } from "../utils/graphClients";
+import { campaignClient } from "../../../utils/graphClients";
 import gql from "graphql-tag";
-import Chart from "./Chart";
+import ChartContainer from "../container/ChartContainer";
+import { useStoreActions, useStoreState } from "easy-peasy";
 
 import DateFnsUtils from "@date-io/date-fns";
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-
-const converStringToFloat = (string, fixNumber) => {
-  return parseFloat(string);
-};
 
 const convertSecondToMHSTime = (second) => {
   var measuredTime = new Date(null);
@@ -60,107 +57,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const bot = {
-  pageviews: 168,
-  users: 5,
-  newUsers: 5,
-  sessions: 11,
-  avgSessionDuration: "2281.090909090909",
-  bounceRate: "27.27272727272727",
-  __typename: "PageGa",
-};
-
-export default (props) => {
-  console.log(props.match.params.campaignId);
+export default ({ campaignId, gaTraffic, dateSelected, setDateSelected }) => {
   const classes = useStyles();
-
-  const [gaTraffic, setGaTraffic] = useState();
-  const [gaTrafficByDay, setGaTrafficByDay] = useState([]);
-  const [gaSources, setGaSources] = useState([]);
-  const [totalAction, setTotalAction] = useState();
-
-  const [page, setPage] = useState(1);
-  const [searchValue, setSearchValue] = useState("");
-
-  const [dateSelected, setDateSelected] = useState({
-    createdAt: new Date(),
-    expiredAt: new Date(),
-  });
-
-  const chart = React.createRef();
-  let searchRef = useRef();
-
-  const getGaTraffic = gql`
-    query($campaignId: String) {
-      getGaTraffic(campaignId: $campaignId) {
-        pageviews
-        users
-        newUsers
-        sessions
-        avgSessionDuration
-        bounceRate
-      }
-    }
-  `;
-  const getGaTrafficByDay = gql`
-    query($campaignId: String) {
-      getGaTrafficByDay(campaignId: $campaignId) {
-        date
-        numberOfUser
-      }
-    }
-  `;
-  const getSources = gql`
-    query($campaignId: String) {
-      getSources(campaignId: $campaignId) {
-        sourceMedium
-        users
-        newUsers
-        sessions
-        bounceRate
-        pageviewsPerSession
-        avgSessionDuration
-      }
-    }
-  `;
-
-  const handlePage = (newPage) => {
-    setPage(newPage);
-  };
-  const handleSearch = () => {
-    setSearchValue(searchRef.value);
-  };
-
-  // useEffect(() => {
-  //   campaignClient
-  //     .query({
-  //       query: getGaTraffic,
-  //       variables: { campaignId: props.match.params.campaignId },
-  //     })
-  //     .then((res) => {
-  //       console.log(res.data.getGaTraffic);
-  //       setGaTraffic(res.data.getGaTraffic);
-  //     });
-  //   campaignClient
-  //     .query({
-  //       query: getGaTrafficByDay,
-  //       variables: { campaignId: props.match.params.campaignId },
-  //     })
-  //     .then((res) => {
-  //       console.log(res.data.getGaTrafficByDay);
-  //       setGaTrafficByDay(res.data.getGaTrafficByDay);
-  //     });
-  //   campaignClient
-  //     .query({
-  //       query: getSources,
-  //       variables: { campaignId: props.match.params.campaignId },
-  //     })
-  //     .then((res) => {
-  //       console.log(res.data.getSources);
-  //       setGaSources(res.data.getSources);
-  //     });
-  // }, []);
-
   return (
     <React.Fragment>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -193,14 +91,12 @@ export default (props) => {
           }}
         />
       </MuiPickersUtilsProvider>
-      <di>
-        <Chart />
-      </di>
+      <ChartContainer campaignId={campaignId} dateSelected={dateSelected} />
       <div className={classes.wrapperAnalytics}>
-        {Object.entries(bot).map(
+        {Object.entries(gaTraffic).map(
           ([key, value]) =>
             key !== "__typename" && (
-              <Card className={classes.rootCard}>
+              <Card className={classes.rootCard} key={key}>
                 {
                   <CardContent>
                     <Typography
@@ -219,7 +115,7 @@ export default (props) => {
             )
         )}
       </div>
-      <SourceAnalytics />
+      <SourceAnalyticsContainer campaignId={campaignId} />
     </React.Fragment>
   );
 };

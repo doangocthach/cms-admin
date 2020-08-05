@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import "./ListWorkspace.scss";
 import {
-  TextField,
   TableContainer,
   TableRow,
   TableCell,
@@ -13,16 +12,14 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import { Pagination } from "@material-ui/lab";
-import AddWorkspaceForm from "./AddWorkspaceForm";
-import gql from "graphql-tag";
-import { workspaceClient } from "../utils/graphClients";
-import { convertDateNow } from "../utils/Date";
+import AddWorkspaceFormContainer from "../container/AddWorkspaceFormContainer";
+import { convertDateNow } from "../../../utils/Date";
 import EnhancedTableToolbar, {
   stableSort,
   getComparator,
   EnhancedTableHead,
-} from "./HeadTable";
-
+} from "../../../common/HeadTable";
+import SearchBar from "../../../common/SearchBar";
 const useStyles = makeStyles((theme) => ({
   root: {
     "& > *": {
@@ -73,114 +70,29 @@ const headCells = [
   },
 ];
 
-export default function ListWorkspace() {
+export default function ListWorkspace({
+  workspaces,
+  handleClose,
+  open,
+  handlePage,
+  totalWorkspace,
+  handleClick,
+  isSelected,
+  orderBy,
+  order,
+  handleRequestSort,
+  handleSelectAllClick,
+  selected,
+  setSearchValue,
+  handleOpen,
+}) {
   const classes = useStyles();
-  const [page, setPage] = useState(1);
-  const [searchValue, setSearchValue] = useState("");
-  const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState("calories");
-  const [selected, setSelected] = React.useState([]);
-  const [workspaces, setWorkspace] = useState([]);
-  const [totalWorkspace, setTotalWorkspace] = useState();
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const [open, setOpen] = React.useState(false);
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  let searchRef = useRef();
-
-  const query = gql`
-    query($page: Int, $query: String) {
-      getListWorkspace(page: $page, query: $query) {
-        listWorkspace {
-          id
-          name
-          email
-          createdAt
-        }
-        totalWorkspace
-      }
-    }
-  `;
-  useEffect(() => {
-    workspaceClient
-      .query({
-        query,
-        variables: { page: page, query: searchValue },
-        fetchPolicy: "no-cache",
-      })
-      .then((res) => {
-        setWorkspace(res.data.getListWorkspace.listWorkspace);
-        setTotalWorkspace(res.data.getListWorkspace.totalWorkspace);
-      });
-  }, [query, page, searchValue]);
-
-  const handleSearch = () => {
-    setSearchValue(searchRef.value);
-  };
-
-  const handlePage = (newPage) => {
-    setPage(newPage);
-  };
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = workspaces.map((n) => n.id);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event, id) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelected(newSelected);
-  };
-
-  const isSelected = (id) => selected.indexOf(id) !== -1;
 
   return (
     <React.Fragment>
       <div className="list-workspace">
-        <div className="search-input">
-          <TextField
-            className="search-input__input"
-            label="Search"
-            inputRef={(value) => (searchRef = value)}
-          ></TextField>
-          <Button
-            className="search__button"
-            onClick={() => {
-              handleSearch();
-            }}
-          >
-            <i className="fas fa-search "></i>
-          </Button>
-        </div>
+        {console.log(workspaces)}
+        <SearchBar setQuery={setSearchValue} />
         <Button onClick={handleOpen}>+Add Workspace</Button>
         <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer component={Paper}>
@@ -217,7 +129,9 @@ export default function ListWorkspace() {
                       >
                         <Checkbox
                           checked={isItemSelected}
-                          inputProps={{ "aria-labelledby": labelId }}
+                          inputProps={{
+                            "aria-labelledby": labelId,
+                          }}
                         />
                       </TableCell>
                       <TableCell
@@ -244,18 +158,18 @@ export default function ListWorkspace() {
       </div>
       <div className={classes.root + " page-wrapper"}>
         <Pagination
-          count={Math.ceil(totalWorkspace / 10) || 1}
+          count={Math.ceil(totalWorkspace / 3) || 1}
           shape="rounded"
           onChange={(e, newPage) => {
             handlePage(newPage);
           }}
         />
       </div>
-      <AddWorkspaceForm
+      <AddWorkspaceFormContainer
         open={open}
         handleClose={handleClose}
         workspaces={workspaces}
-        setWorkspace={setWorkspace}
+        // setWorkspace={setWorkspace}
       />
     </React.Fragment>
   );

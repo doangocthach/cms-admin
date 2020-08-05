@@ -16,7 +16,7 @@ export const convertDateNow = (now) => {
   return `${day}/${month}/${year} ${hour}:${minutes}:${seconds}`;
 
   function checkZero(data) {
-    if (data.length == 1) {
+    if (data.length === 1) {
       data = "0" + data;
     }
     return data;

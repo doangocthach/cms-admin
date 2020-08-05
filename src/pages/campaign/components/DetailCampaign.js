@@ -18,8 +18,9 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { Parser } from "json2csv";
-import { campaignClient } from "../utils/graphClients";
+import { campaignClient } from "../../../utils/graphClients";
 import gql from "graphql-tag";
+import { useStoreActions, useStoreState } from "easy-peasy";
 
 const useStyles = makeStyles((theme) => ({
   btn: {
@@ -56,11 +57,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const leaders = require("./a.json");
-
 const Leaderboard = ({ open, handleClose, data }) => {
-  // const [leaders] = React.useState(data);
-  // console.log(leaders);
   const classes = useStyles();
   return (
     <Dialog
@@ -174,37 +171,21 @@ const EnableTrading = ({ open, handleClose, setEnableTrading, trackingId }) => {
   );
 };
 
-export default ({ campaign, open, handleClose }) => {
+export default ({
+  campaign,
+  trackingIdSelected,
+  setEnableTrading,
+  setOpenTradingDialog,
+  openTradingDialog,
+  leaders,
+  setOpenLeaderboard,
+  openLeaderboard,
+  handleOpenTrading,
+  handleViewTrading,
+  open,
+  handleClose,
+}) => {
   const classes = useStyles();
-  const [enableTrading, setEnableTrading] = React.useState(false);
-  const [openTradingDialog, setOpenTradingDialog] = React.useState(false);
-  const [openLeaderboard, setOpenLeaderboard] = React.useState(false);
-  const [trackingId, setTrackingId] = React.useState("");
-
-  const mutation = gql`
-    mutation($campaignId: String, $campaignName: String) {
-      enableTracking(campaignId: $campaignId, campaignName: $campaignName)
-    }
-  `;
-
-  const handleCloseTrading = () => {
-    setEnableTrading(false);
-  };
-
-  const handleOpenTrading = async () => {
-    const res = await campaignClient
-      .mutate({
-        mutation,
-        variables: { campaignId: campaign._id, campaignName: campaign.name },
-      })
-      .then((res) => {
-        setTrackingId(res.data.enableTracking);
-      });
-    console.log(res);
-  };
-  const handleViewTrading = (trackingId) => {
-    setTrackingId(trackingId);
-  };
 
   return (
     <React.Fragment>
@@ -219,7 +200,7 @@ export default ({ campaign, open, handleClose }) => {
           <p>{campaign.name}</p>
           <Divider />
           <h3>Workspace</h3>
-          <p>{campaign.workspaceName}</p>
+          <p>{campaign.email}</p>
           <Divider />
           <br />
           {campaign && campaign.googleAnalytics ? (
@@ -267,13 +248,13 @@ export default ({ campaign, open, handleClose }) => {
         open={openLeaderboard}
         handleClose={setOpenLeaderboard}
         data={leaders}
-        trackingId={trackingId}
+        trackingId={trackingIdSelected}
       />
       <EnableTrading
         open={openTradingDialog}
         handleClose={setOpenTradingDialog}
         setEnableTrading={setEnableTrading}
-        trackingId={trackingId}
+        trackingId={trackingIdSelected}
       />
     </React.Fragment>
   );

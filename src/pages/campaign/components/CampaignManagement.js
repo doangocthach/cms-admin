@@ -12,30 +12,19 @@ import {
   Popover,
   Typography,
 } from "@material-ui/core";
-import axios from "../utils/axios";
 import EnhancedTableToolbar, {
   stableSort,
   getComparator,
   EnhancedTableHead,
-} from "./HeadTable";
-import { TextField, Button } from "@material-ui/core";
+} from "../../../common/HeadTable";
+import { Button } from "@material-ui/core";
 import EditCampaignForm from "./EditCampaignForm";
-import DetailCampaign from "./DetailCampaign";
-import AddCampaignForm from "./AddCampaignForm";
-import gql from "graphql-tag";
-import { campaignClient } from "../utils/graphClients";
-import { convertDateNow } from "../utils/Date";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useHistory,
-} from "react-router-dom";
+import DetailCampaignContainer from "../container/DetailCampaignContainer";
+import AddCampaignFormContainer from "../container/AddCampaignFormContainer";
+import { convertDateNow } from "../../../utils/Date";
+import { Link } from "react-router-dom";
+import SearchBar from "../../../common/SearchBar";
 
-function createData(name, workspace, fromDate, toDate) {
-  return { name, workspace, fromDate, toDate };
-}
 const headCells = [
   {
     id: "name",
@@ -44,19 +33,18 @@ const headCells = [
     label: "Name",
   },
   {
-    id: "workspace",
+    id: "workspaceName",
     numeric: false,
     disablePadding: false,
     label: "Workspace",
   },
   {
-    id: "email",
+    id: "createdAt",
     numeric: false,
     disablePadding: false,
-    label: "Email",
+    label: "Created Date",
   },
-  { id: "fromDate", numeric: false, disablePadding: false, label: "From" },
-  { id: "toDate", numeric: false, disablePadding: false, label: "To" },
+  { id: "expiredAt", numeric: false, disablePadding: false, label: "To" },
 ];
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -85,137 +73,40 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function EnhancedTable() {
+export default function ({
+  campaigns,
+  setSearchValue,
+  handleOpen,
+  selected,
+  dense,
+  order,
+  orderBy,
+  handleSelectAllClick,
+  handleRequestSort,
+  isSelected,
+  handleClick,
+  id,
+  openPop,
+  anchorEl,
+  setAnchorEl,
+  handlerClickOpen,
+  setOpenEditForm,
+  setDataSelected,
+  dataSelected,
+  openDetail,
+  handlerClose,
+  openEditForm,
+  open,
+  setOpen,
+  totalCampains,
+  handlePage,
+}) {
   const classes = useStyles();
-  const [campaigns, setCampaigns] = useState([]);
-  const [totalCampains, setTotalCampains] = useState();
 
-  const [order, setOrder] = React.useState("asc");
-  const [orderBy, setOrderBy] = React.useState("calories");
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = useState(1);
-  const [searchValue, setSearchValue] = useState("");
-  const [dense] = React.useState(false);
-  const [openDetail, setOpenDetail] = React.useState(false);
-  const [dataSelected, setDataSelected] = React.useState({});
-  const history = useHistory();
-  let searchRef = useRef();
-
-  const query = gql`
-    query($page: Int, $query: String) {
-      getListCampaign(page: $page, query: $query) {
-        listCampaign {
-          _id
-          name
-          email
-          googleAnalytics {
-            trackingId
-            viewId
-            isActive
-          }
-          createdAt
-          expiredAt
-          workspaceName
-        }
-        totalCampaign
-      }
-    }
-  `;
-  useEffect(() => {
-    campaignClient
-      .query({
-        query,
-        variables: { page: page, query: searchValue },
-        fetchPolicy: "no-cache",
-      })
-      .then((res) => {
-        setCampaigns(res.data.getListCampaign.listCampaign);
-        setTotalCampains(res.data.getListCampaign.totalCampaign);
-      });
-  }, [query, page, searchValue]);
-
-  const [openEditForm, setOpenEditForm] = React.useState(false);
-  const handlerClickOpen = () => {
-    setOpenDetail(true);
-  };
-
-  const handlerClose = () => {
-    setOpenDetail(false);
-  };
-
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = campaigns.map((n) => n._id);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelected(newSelected);
-  };
-
-  const isSelected = (name) => selected.indexOf(name) !== -1;
-
-  const handlePage = (newPage) => {
-    setPage(newPage);
-  };
-  const handleSearch = () => {
-    setSearchValue(searchRef.value);
-  };
-
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
-  const openPop = Boolean(anchorEl);
-  const id = openPop ? "simple-popover" : undefined;
   return (
     <div className={classes.root}>
-      <div className="search-input">
-        <TextField
-          className="search-input__input"
-          label="Search"
-          inputRef={(value) => (searchRef = value)}
-        ></TextField>
-        <Button
-          className="search__button"
-          onClick={() => {
-            handleSearch();
-          }}
-        >
-          <i className="fas fa-search "></i>
-        </Button>
-      </div>
+      <SearchBar setQuery={setSearchValue} />
+
       <Button onClick={handleOpen}>+Add Campaign</Button>
       <EnhancedTableToolbar numSelected={selected.length} />
       <TableContainer>
@@ -270,7 +161,6 @@ export default function EnhancedTable() {
                           {row.name}
                         </Link>
                       </TableCell>
-                      <TableCell align="left">{row.workspaceName}</TableCell>
                       <TableCell align="left">{row.email}</TableCell>
                       <TableCell align="left">
                         {convertDateNow(row.createdAt)}
@@ -329,13 +219,7 @@ export default function EnhancedTable() {
           </Table>
         </Paper>
       </TableContainer>
-      {/* <Switch>
-          <Route
-            path={"/campaign-infomation"}
-            children={<CampaignInfomation />}
-          />
-        </Switch> */}
-      <DetailCampaign
+      <DetailCampaignContainer
         campaign={dataSelected}
         open={openDetail}
         handleClose={handlerClose}
@@ -345,15 +229,17 @@ export default function EnhancedTable() {
         open={openEditForm}
         handleClose={setOpenEditForm}
       />
-      <AddCampaignForm
+      <AddCampaignFormContainer
         open={open}
-        handleClose={handleClose}
+        handleClose={() => {
+          setOpen(false);
+        }}
         campaigns={campaigns}
-        setCampaigns={setCampaigns}
+        // setCampaigns={setCampaigns}
       />
       <div className={classes.root + " page-wrapper"}>
         <Pagination
-          count={Math.ceil(totalCampains / 3) || 1}
+          count={Math.ceil(totalCampains / 10) || 1}
           shape="rounded"
           onChange={(e, newPage) => {
             handlePage(newPage);

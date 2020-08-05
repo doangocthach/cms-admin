@@ -12,8 +12,49 @@ import {
   TableSortLabel,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
-import FilterListIcon from "@material-ui/icons/FilterList";
 import { lighten, makeStyles } from "@material-ui/core/styles";
+
+// const handleRequestSort = (event, property) => {
+//   const isAsc = orderBy === property && order === "asc";
+//   setOrder(isAsc ? "desc" : "asc");
+//   setOrderBy(property);
+// };
+
+// const handleSelectAllClick = (event) => {
+//   if (event.target.checked) {
+//     const newSelecteds = campaigns.map((n) => n._id);
+//     setSelected(newSelecteds);
+//     return;
+//   }
+//   setSelected([]);
+// };
+
+// const handleClick = (event, name) => {
+//   const selectedIndex = selected.indexOf(name);
+//   let newSelected = [];
+
+//   if (selectedIndex === -1) {
+//     newSelected = newSelected.concat(selected, name);
+//   } else if (selectedIndex === 0) {
+//     newSelected = newSelected.concat(selected.slice(1));
+//   } else if (selectedIndex === selected.length - 1) {
+//     newSelected = newSelected.concat(selected.slice(0, -1));
+//   } else if (selectedIndex > 0) {
+//     newSelected = newSelected.concat(
+//       selected.slice(0, selectedIndex),
+//       selected.slice(selectedIndex + 1)
+//     );
+//   }
+
+//   setSelected(newSelected);
+// };
+
+// const isSelected = (name) => selected.indexOf(name) !== -1;
+
+// const handlePage = (newPage) => {
+//   setPage(newPage);
+// };
+
 export function EnhancedTableHead(props) {
   const {
     classes,

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+// import { useHistory } from "react-router-dom";
 import {
   TextField,
   Button,
@@ -11,29 +11,8 @@ import {
   makeStyles,
 } from "@material-ui/core";
 import "./createWorkspace.css";
-import { workspaceClient } from "../utils/graphClients";
-import gql from "graphql-tag";
 
-export default ({ open, handleClose, workspaces, setWorkspace }) => {
-  const [state, setState] = useState({ name: "", email: "" });
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    const mutation = gql`
-      mutation($name: String, $email: String) {
-        createWorkspace(name: $name, email: $email) {
-          id
-          name
-          email
-          createdAt
-        }
-      }
-    `;
-    const res = await workspaceClient.mutate({ mutation, variables: state });
-    const newWorkspace = [...workspaces];
-    newWorkspace.pop();
-    setWorkspace([res.data.createWorkspace, ...newWorkspace]);
-  };
+export default ({ handleFormSubmit, state, setState, handleClose, open }) => {
   const useStyles = makeStyles((theme) => ({
     dialog: {
       display: "flex",

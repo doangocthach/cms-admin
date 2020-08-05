@@ -1,5 +1,6 @@
 import React from "react";
-import WorkSpaceManagement from "./WorkSpaceManagement";
+// import WorkSpaceManagementContainer from "./WorkSpaceManagementContainer";
+import WorkSpaceManagementContainer from "./pages/workspace/container/WorkspaceManagementContainer";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Divider from "@material-ui/core/Divider";
@@ -15,8 +16,8 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import CampaignManagement from "./CampaignManagement";
-import CampaignInfomation from "./CampaignInfomation";
+import CampaignManagement from "./pages/campaign/container/CampaignManagementContainer";
+import CampaignInfomation from "./pages/campaign/container/CampaignInfomationContainer";
 
 const drawerWidth = 240;
 
@@ -68,16 +69,16 @@ export default (props) => {
         <div className={classes.toolbar} />
         <Divider />
         <List>
-          <ListItem button>
-            <Link to="/workspaces">
+          <Link to="/workspaces">
+            <ListItem button>
               <ListItemText primary="Workspaces" />
-            </Link>
-          </ListItem>
-          <ListItem button>
-            <Link to="/campaigns">
+            </ListItem>
+          </Link>
+          <Link to="/campaigns">
+            <ListItem button>
               <ListItemText primary="Campaigns" />
-            </Link>
-          </ListItem>
+            </ListItem>
+          </Link>
         </List>
         <Divider />
       </div>
@@ -140,7 +141,10 @@ export default (props) => {
         <main className={classes.content}>
           <div className={classes.toolbar} />
           <Switch>
-            <Route path={"/workspaces"} children={<WorkSpaceManagement />} />
+            <Route
+              path={"/workspaces"}
+              children={<WorkSpaceManagementContainer />}
+            />
             <Route path={"/campaigns"} children={<CampaignManagement />} />
             <Route
               path={"/campaign-infomation/:campaignId"}
